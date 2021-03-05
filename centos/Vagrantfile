@@ -1,0 +1,18 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    (0..0).each do |i|
+        vb_name = "server#{i}"
+
+        config.vm.define vb_name do |subconfig|
+            subconfig.vm.box = "centos/7"
+            subconfig.vm.hostname = vb_name
+
+            config.vm.provider "virtualbox" do |v|
+                v.name = vb_name
+            end
+        end
+    end
+end
+

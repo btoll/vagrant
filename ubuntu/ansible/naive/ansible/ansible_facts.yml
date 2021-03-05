@@ -1,0 +1,9 @@
+---
+- name: Display some facts
+  hosts: 127.0.0.1
+
+  tasks:
+    - name: Display all facts
+      debug:
+        var: ansible_facts
+
