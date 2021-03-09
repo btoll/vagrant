@@ -1,0 +1,17 @@
+---
+- src: https://github.com/btoll/ansible-role-mysql
+  version: main
+  name: mysql
+
+- src: https://github.com/btoll/ansible-role-nginx
+  version: main
+  name: nginx
+
+- src: https://github.com/btoll/ansible-role-php
+  version: main
+  name: php
+
+- src: https://github.com/btoll/ansible-role-italy
+  version: main
+  name: italy
+

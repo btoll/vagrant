@@ -1,0 +1,11 @@
+---
+- name: Italian Dictionary website
+  hosts: webservers
+  become: true
+
+  roles:
+    - mysql
+    - nginx
+    - php
+    - italy
+
