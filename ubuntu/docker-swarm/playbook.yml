@@ -1,0 +1,8 @@
+---
+- name: Docker swarm lab
+  hosts: cluster
+  become: true
+
+  roles:
+    - docker
+

@@ -1,0 +1,5 @@
+---
+- src: https://github.com/btoll/ansible-role-docker
+  version: main
+  name: docker
+
