@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://community.torproject.org/onion-services/setup/
+# https://community.torproject.org/onion-services/setup/install/
+# https://support.torproject.org/apt/tor-deb-repo/
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/bionic64"
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        apt-get install -y apt-transport-https
+
+        {
+            echo "deb     https://deb.torproject.org/torproject.org bionic main" ;
+            echo "deb-src https://deb.torproject.org/torproject.org bionic main" ;
+        } > /etc/apt/sources.list.d/tor.list
+
+        wget -qO- https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --import
+        gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
+
+        apt-get update
+        # We provide a Debian package to help you keep our signing key current.
+        apt-get install -y tor deb.torproject.org-keyring
+
+        apt-get install -y nginx
+        {
+            echo "HiddenServiceDir /var/lib/tor/benjamintoll.com" ;
+            echo "HiddenServicePort 80 127.0.0.1:80" ;
+        } > /etc/tor/torrc
+
+        systemctl restart tor
+
+        # Give tor service time to restart.
+        sleep 10
+
+        cp /var/lib/tor/benjamintoll.com/hostname /vagrant
+    SHELL
+end
+
