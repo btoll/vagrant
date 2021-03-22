@@ -1,0 +1,9 @@
+---
+- name: Tor
+  hosts: tor
+  become: true
+
+  roles:
+    - tor
+    - nginx
+

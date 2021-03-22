@@ -1,0 +1,9 @@
+---
+- src: https://github.com/btoll/ansible-role-tor
+  version: main
+  name: tor
+
+- src: https://github.com/btoll/ansible-role-nginx
+  version: main
+  name: nginx
+
