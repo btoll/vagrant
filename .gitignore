@@ -2,4 +2,5 @@
 *console.log
 config
 playbook.retry
+*.crt
 
