@@ -2,6 +2,16 @@
 
 set -ex
 
+IP=${1:-10.8.8.30}
+# We're building an IP pool (a range).
+# End result is:
+#   - 10.8.8.30-10.8.8.40
+# TODO: There should be checks for end of range, i.e. 254.
+LAST_OCTET="${IP##*.}"
+ADD_TEN=$(( LAST_OCTET + 10 ))
+# String replacement.
+IP_ADD_TEN="${IP/$LAST_OCTET/$ADD_TEN}"
+
 # Install kube-router.
 # https://github.com/cloudnativelabs/kube-router/blob/master/docs/user-guide.md
 kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kube-router-all-service-daemonset.yaml
@@ -27,7 +37,7 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 192.168.1.240-192.168.1.250
+      - ${IP}-${IP_ADD_TEN}
 EOF
 )
 
