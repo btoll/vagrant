@@ -3,4 +3,5 @@
 config
 playbook.retry
 *.crt
+kubeadm-init.out
 
