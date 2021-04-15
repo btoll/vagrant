@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NAME="collectd"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/bionic64"
+    config.vm.hostname = NAME
+    config.vm.network "public_network", ip: "192.168.1.213", bridge: "wlp3s0"
+
+    config.vm.provider "virtualbox" do |v|
+        v.name = NAME
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        apt-get install -y apache2 build-essential collectd git libcgi-session-perl libhtml-parser-perl libjson-perl librrds-perl python
+
+        a2enmod cgi cgid
+        yes | cpan JSON
+        yes | cpan cgi
+
+        cp /vagrant/etc-apache2-sites-available-000-default.conf /etc/apache2/sites-available/000-default.conf
+        cp /vagrant/etc-apache2-ports.conf /etc/apache2/ports.conf
+        systemctl restart apache2
+
+        # As user:
+        # git clone https://github.com/httpdss/collectd-web.git
+        # chmod +x collectd-web/cgi-bin/graphdefs.cgi
+        # sed -i 's/127.0.0.1/0.0.0.0/' collectd-web/runserver.py
+        # cd collectd-web && ./runserver.py &
+        # x-www-browser 192.168.1.213:8888
+    SHELL
+end
+
