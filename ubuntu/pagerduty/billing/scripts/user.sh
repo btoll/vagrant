@@ -2,15 +2,21 @@
 
 set -e
 
-DOMAINS=(
-    pagerduty-docker.jfrog.io
-    pagerduty-docker-virtual.jfrog.io
-    pagerduty-shipping-containers.jfrog.io
+# This is necessary to access the private repos (see README).
+ssh-keyscan -H github.com >> .ssh/known_hosts
+
+REPOS=(
+    billing.git
+    dockerfiles.git
 )
 
-ssh-keyscan -H github.com >> .ssh/known_hosts
-git clone git@github.com:PagerDuty/billing.git
+for repo in "${REPOS[@]}"
+do
+    git clone "git@github.com:PagerDuty/$repo"
+done
 
+# http://asdf-vm.com/guide/getting-started.html
+#
 # `advice.detachedHead=false` prevents the following warning(s) in `vagrant up` stdout:
 #
 #       default: You are in 'detached HEAD' state. You can look around, make experimental
@@ -20,26 +26,28 @@ git clone git@github.com:PagerDuty/billing.git
 #
 git clone -c advice.detachedHead=false https://github.com/asdf-vm/asdf.git .asdf --branch v0.8.1
 
-# http://asdf-vm.com/manage/configuration.html#plugin-repository-last-check-duration
-
 # For `asdf`, `gem`, `bundle`, et al
 PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
 
 (
-        echo ". $HOME/.asdf/asdf.sh" ;
-        echo ". $HOME/.asdf/completions/asdf.bash" ;
+    echo ". $HOME/.asdf/asdf.sh" ;
+    echo ". $HOME/.asdf/completions/asdf.bash" ;
 ) >> .bashrc
 
-cd billing
+# https://github.com/PagerDuty/billing#environment-setup
+cd "$HOME/billing"
 asdf plugin-add ruby
 asdf install
-
 bundle config pagerduty.jfrog.io "$JFROG_USERNAME:$JFROG_PASSWORD"
 gem install bundler
 bundle install
 
-cd
-git clone git@github.com:PagerDuty/dockerfiles.git
+# https://github.com/PagerDuty/web#configure-jfrog-pagerduty-artifactory-access
+DOMAINS=(
+    pagerduty-docker-virtual.jfrog.io
+    pagerduty-docker.jfrog.io
+    pagerduty-shipping-containers.jfrog.io
+)
 
 for domain in "${DOMAINS[@]}"
 do
@@ -50,11 +58,13 @@ docker run -v "$HOME/.bundle:/root/.bundle" \
     pagerduty-docker-virtual.jfrog.io/ruby:2.4.10 \
     bundle config pagerduty.jfrog.io "$JFROG_USERNAME:$JFROG_PASSWORD"
 
-cd dockerfiles/composes
+# https://github.com/PagerDuty/web#running-data-storage-services-locally
+cd "$HOME/dockerfiles/composes"
 ./mysql-zk-memcached-kafka.sh up -d
 
-bundle exec rake db:setup
-bundle exec rails server
+#bundle exec rake db:setup
+# To access from host machine, bind on all interfaces.
+#bundle exec rails server -b 0.0.0.0
 
-curl http://localhost:3000/status
+#curl http://localhost:3000/status
 

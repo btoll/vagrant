@@ -40,6 +40,8 @@ curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compo
     -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
+# Linux doesn't need to use `dnsmasq` (ignore https://github.com/PagerDuty/web#install-and-setup-dnsmasq-server).
+# Instead, add to `/etc/hosts`.
 (
     echo "127.0.0.1     pagerduty.dev" ;
     echo "127.0.0.1     pagerduty.net" ;
