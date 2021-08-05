@@ -2,6 +2,8 @@
 
 ### To clone private repositories
 
+1. Ensure the `ssh-agent` host is running and seeded with the correct key.
+    `eval $(ssh-agent) && ssh-add`
 1. Must not `git clone` as the root user (so, we're doing it in `./scripts/user.sh`).
 1. Add `config.ssh.forward_agent = true` to Vagrantfile.
 1. Get the host's pubkey (github.com) and add it to `known_hosts`.
@@ -21,4 +23,6 @@ or
 $ JFROG_USERNAME=kilgore-trout JFROG_PASSWORD=your-api-key \
     vagrant up
 ```
+
+TODO: use Ansible for provisioning.
 

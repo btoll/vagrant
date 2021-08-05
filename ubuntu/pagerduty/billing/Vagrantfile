@@ -3,8 +3,14 @@
 
 Vagrant.configure("2") do |config|
     config.vm.box = "ubuntu/focal64"
+    config.vm.network :private_network, ip: "192.168.0.42"
 
     config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "billing"
+    end
 
     config.vm.provision :shell do |s|
         s.path = "scripts/root.sh"
