@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    # The `focal` image is throwing an exception, temporarily use `bionic`.
+    config.vm.box = "ubuntu/bionic64"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "service-search-service"
+    end
+
+    config.vm.provision :shell do |s|
+        s.path = "scripts/root.sh"
+    end
+end
+
