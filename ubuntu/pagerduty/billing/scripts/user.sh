@@ -65,6 +65,5 @@ cd "$HOME/dockerfiles/composes"
 #bundle exec rake db:setup
 # To access from host machine, bind on all interfaces.
 #bundle exec rails server -b 0.0.0.0
-
 #curl http://localhost:3000/status
 

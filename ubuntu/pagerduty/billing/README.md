@@ -28,7 +28,23 @@ JFROG_USERNAME=kilgore-trout JFROG_PASSWORD=your-api-key \
     vagrant up
 ```
 
+### Log into VM and setup database and start rails
+
+```
+bundle exec rake db:setup
+bundle exec rails server -b 0.0.0.0     # To access from host machine, bind on all interfaces.
+```
+
+### Open in browser
+
+open localhost:3000
+
+### Test `/status` endpoint
+
+curl localhost:3000/status
+
 ### TODO
 
+- Automate the manual steps.
 - Use Ansible for provisioning.
 
