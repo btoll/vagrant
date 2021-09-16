@@ -1,0 +1,52 @@
+---
+#- name: Add tor repositories
+#  template:
+#    src: tor.list.j2
+#    dest: /etc/apt/sources.list.d/tor.list
+
+#- name: Add Tor's signing key
+#  apt_key:
+#    url: https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc
+#    state: present
+
+- name: Install packages to be able to retrieve and store Tor GPG key
+  apt:
+    pkg: "{{ packages.pre }}"
+    update_cache: yes
+    cache_valid_time: 36000
+    state: present
+
+- name: Download and import GPG key
+  #  remote_user: vagrant
+  shell: |
+    wget -qO- https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --import
+    gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
+#  become: true
+#  become_user: vagrant
+
+- name: Add Tor respositories
+  apt_repository:
+    repo: "{{ item.repo }}"
+    filename: tor
+    state: present
+  loop:
+    - { repo: "deb https://deb.torproject.org/torproject.org {{ DISTRO }} main" }
+    - { repo: "deb-src https://deb.torproject.org/torproject.org {{ DISTRO }} main" }
+
+- name: Install Tor packages
+  apt:
+    pkg: "{{ packages.post }}"
+    update_cache: yes
+    cache_valid_time: 36000
+    state: present
+
+- name: Configure Tor
+  template:
+    src: torrc.j2
+    dest: /etc/tor/torrc
+
+- name: Start Tor
+  service:
+    name: tor
+    state: started
+

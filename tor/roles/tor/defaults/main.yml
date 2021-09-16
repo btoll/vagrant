@@ -1,0 +1,7 @@
+---
+DISTRO: bionic
+HIDDEN_SERVICE_DIR: /var/lib/tor
+HOSTNAME: benjamintoll.com
+PORT: 80
+SITE: benjamintoll.com
+

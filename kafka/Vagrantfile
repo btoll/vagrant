@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+    config.vm.provider "virtualbox" do |v|
+        v.memory = 4096
+        v.name = "kafka"
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt update && apt upgrade
+        apt install -y default-jre wget
+        wget -c https://mirrors.gigenet.com/apache/kafka/2.8.0/kafka_2.12-2.8.0.tgz -O - | tar xz
+        mkdir -p /usr/local/bin
+        cp -r kafka* /usr/local/bin/kafka
+    SHELL
+end
+

@@ -1,0 +1,10 @@
+---
+packages:
+  pre:
+    - gpg
+    - wget
+  post:
+    - apt-transport-https
+    - deb.torproject.org-keyring
+    - tor
+

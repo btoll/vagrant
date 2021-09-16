@@ -4,7 +4,9 @@
 Vagrant.configure("2") do |config|
     config.vm.box = "ubuntu/bionic64"
     config.vm.hostname = "tor"
-    config.vm.network "public_network", ip: "192.168.1.100", bridge: "wlp3s0"
+    config.vm.network :public_network, ip: "192.168.1.253", bridge: "wlp0s20f3"
+#    config.vm.network :forwarded_port, host: 1992, guest: 80
+#    config.vm.network :private_network, ip: "10.0.0.10"
 
     config.vm.provider "virtualbox" do |vb|
         vb.memory = 8192
@@ -23,9 +25,9 @@ Vagrant.configure("2") do |config|
         ansible.extra_vars = {
             ansible_python_interpreter: "/usr/bin/python3"
         }
-#        ansible.galaxy_roles_path = '/home/vagrant/.ansible/roles/'
-#        ansible.galaxy_role_file = "requirements.yml"
-#        ansible.galaxy_command = 'ansible-galaxy install --role-file=%{role_file} --roles-path=%{roles_path}'
+        ansible.galaxy_roles_path = nil
+        ansible.galaxy_role_file = "requirements.yml"
+        ansible.galaxy_command = "ansible-galaxy install --role-file=%{role_file} --roles-path=%{roles_path}"
     end
 end
 
