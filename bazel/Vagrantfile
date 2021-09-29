@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://docs.bazel.build/versions/4.2.1/install-ubuntu.html
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/bionic64"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "bazel"
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        # python3-distutils is needed by `bazel build`.
+        apt-get install g++ python3-distutils unzip zip -y
+
+        # Download Bazelisk, a wrapper around Bazel.
+        wget https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64 \
+            -O /usr/local/bin/bazel
+        chmod 755 /usr/local/bin/bazel
+
+        # Download Go.
+        wget https://golang.org/dl/go1.17.1.linux-amd64.tar.gz -O - | tar -xz -C /usr/local/
+        install -m 0755 /usr/local/go/bin/* /usr/local/bin
+
+        {
+            echo "export GOPATH=/home/vagrant/go" ;
+            echo "export GOROOT=/usr/local/go" ;
+#        } >> /etc/skel/.bashrc
+        } >> /home/vagrant/.bashrc
+
+        # Create a `python` simlink so scripts with `/usr/bin/env python` will work correctly.
+        ln -s /usr/bin/python{3,}
+    SHELL
+end
+
