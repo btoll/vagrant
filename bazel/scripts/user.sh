@@ -14,9 +14,10 @@ set +x
 chmod 755 bazel-4.2.1-installer-linux-x86_64.sh
 ./bazel-4.2.1-installer-linux-x86_64.sh --user
 
-# For go.
 {
     echo "export GOPATH=$HOME/go" ;
     echo "export GOROOT=/usr/local/go" ;
+    # Enable bash completion.
+    echo ". $HOME/.bazel/bin/bazel-complete.bash";
 } >> "$HOME/.bashrc"
 
