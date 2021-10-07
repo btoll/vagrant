@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "pd-status-setup"
+    end
+
+    config.vm.provision :shell do |s|
+        s.path = "scripts/root.sh"
+        s.env = {
+            JFROG_USERNAME:ENV["JFROG_USERNAME"],
+            JFROG_PASSWORD:ENV["JFROG_PASSWORD"],
+            ARTIFACTORY_USER:ENV["JFROG_USERNAME"],
+            ARTIFACTORY_PASSWORD:ENV["JFROG_PASSWORD"],
+            CIRCLE_SHA1:"latest"
+        }
+    end
+end
+
