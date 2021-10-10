@@ -4,7 +4,7 @@
 # https://docs.bazel.build/versions/4.2.1/install-ubuntu.html
 
 Vagrant.configure("2") do |config|
-    config.vm.box = "ubuntu/bionic64"
+    config.vm.box = "ubuntu/focal64"
 
     config.ssh.forward_agent = true
 
