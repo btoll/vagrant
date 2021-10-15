@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+#    config.vm.box = "bento/ubuntu-20.04"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "chef"
+    end
+
+#	config.vm.provision "chef_client" do |chef|
+#        chef.install = false
+#		chef.chef_server_url = "https://api.chef.io/organizations/onf"
+#		chef.validation_key_path = "btoll.pem"
+#	end
+
+    config.vm.provision :shell do |s|
+        s.path = "scripts/root.sh"
+        s.env = {
+            CHEF_GITHUB_EMAIL:ENV["CHEF_GITHUB_EMAIL"],
+            CHEF_GITHUB_USER:ENV["CHEF_GITHUB_USER"],
+            CHEF_ORG:ENV["CHEF_ORG"],
+            CHEF_USER:ENV["CHEF_USER"],
+        }
+    end
+end
+
