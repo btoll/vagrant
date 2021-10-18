@@ -1,0 +1,22 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "terraform"
+    end
+
+    config.vm.provision :shell do |s|
+        s.path = "scripts/root.sh"
+        s.env = {
+            AWS_ACCESS_KEY_ID:ENV["AWS_ACCESS_KEY_ID"],
+            AWS_SECRET_ACCESS_KEY:ENV["AWS_SECRET_ACCESS_KEY"],
+        }
+    end
+end
+
