@@ -77,4 +77,3 @@ output "db_subnet_group" {
 output "public_subnets" {
   value = module.vpc.public_subnets
 }
-
