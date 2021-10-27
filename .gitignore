@@ -5,3 +5,5 @@ playbook.retry
 *.crt
 kubeadm-init.out
 
+test/env.sh
+
