@@ -1,0 +1,10 @@
+version: 2
+projects:
+  - name: staging
+    dir: infra/terraform/environments/staging
+    autoplan:
+      when_modified:
+        - ../../modules/**/*.tf
+        - '*.tf*'
+    terraform_version: 0.14.9
+
