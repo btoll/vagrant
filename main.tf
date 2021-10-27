@@ -42,7 +42,8 @@ data "aws_availability_zones" "azs" {}
 ############################################
 
 module "vpc" {
-  source  = "git::https://git@github.com/terraform-aws-modules/vpc/aws"
+#  source  = "git::https://git@github.com/terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
 #  version = "3.7.0"
 
   name = "dev-vpc"
