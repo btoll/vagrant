@@ -30,6 +30,9 @@ apt-get update
 apt-get install terraform=0.13.0
 #terraform -install-autocomplete
 
+curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz" | tar xz
+install -m 0755 terraform-docs /usr/local/bin
+
 # Install AWS CLI.
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip

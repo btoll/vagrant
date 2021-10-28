@@ -49,6 +49,10 @@ curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip
 unzip awscliv2.zip
 sh aws/install
 
+# Install `aws-okta` (follows redirects).
+curl -LO https://github.com/segmentio/aws-okta/releases/download/v1.0.4/aws-okta_v1.0.4_amd64.deb
+dpkg -i aws-okta_v1.0.4_amd64.deb
+
 # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
 {
     echo LANG=en_US.utf-8 ;
