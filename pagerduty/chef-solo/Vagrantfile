@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+
+#    config.vm.network :forwarded_port, host: 4040, guest: 4040 # ngrok
+    config.vm.network :forwarded_port, host: 4141, guest: 4141 # atlantis
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 4096
+        vb.name = "test"
+    end
+
+    config.vm.provision :shell do |s|
+        s.path = "scripts/root.sh"
+        s.env = {
+            AWS_ACCESS_KEY_ID:ENV["AWS_ACCESS_KEY_ID"],
+            AWS_SECRET_ACCESS_KEY:ENV["AWS_SECRET_ACCESS_KEY"],
+            AWS_DEFAULT_REGION:ENV["AWS_DEFAULT_REGION"],
+
+            USER:ENV["USER"],
+            GITHUB_TOKEN:ENV["GITHUB_TOKEN"],
+            GITHUB_USER:ENV["GITHUB_USER"],
+            GIT_HOST:ENV["GIT_HOST"],
+            GITHUB_REPO:ENV["GITHUB_REPO"],
+            REPO_ALLOWLIST:ENV["REPO_ALLOWLIST"],
+
+            CHEF_GITHUB_EMAIL:ENV["CHEF_GITHUB_EMAIL"],
+            CHEF_GITHUB_USER:ENV["CHEF_GITHUB_USER"],
+            CHEF_ORG:ENV["CHEF_ORG"],
+            CHEF_USER:ENV["CHEF_USER"],
+        }
+    end
+
+    config.ssh.forward_agent = true
+end
+
