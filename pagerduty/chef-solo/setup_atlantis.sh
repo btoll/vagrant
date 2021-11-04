@@ -32,8 +32,8 @@ DELETE_URL=$(
 	| jq --raw-output .url
 )
 
-echo "[INFO] Starting Python simple server (in background)..."
-python3 -m http.server 80 &
+#echo "[INFO] Starting Python simple server (in background)..."
+#python3 -m http.server 80 &
 
 echo "[INFO] Starting atlantis server..."
 

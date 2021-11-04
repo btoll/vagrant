@@ -72,5 +72,5 @@ EOF
     echo "export AWS_OKTA_MFA_DUO_DEVICE=token" ;
 } >> "$HOME/.bashrc"
 
-cp /vagrant/{setup.sh,chef-solo.tgz,solo.rb,web.json} .
+cp /vagrant/{setup_atlantis.sh,chef-solo.tgz,solo.rb,web.json} .
 
