@@ -108,6 +108,23 @@ The solution is to always make sure that the `ssh-agent` is properly seeded befo
 
 Make sure you've added "/events" to the URL for the GitHub webhook!  This is done automatically for you, but if you've futzed with the shell code than this could become an issue.
 
+## `aws-okta` commands
+
+It takes the form of:
+
+```
+aws-okta exec PROFILE -- COMMAND
+```
+
+Examples:
+
+```
+aws-okta exec taos -- aws sts get-caller-identity
+
+aws-okta exec <profile> -- aws s3api list-buckets
+
+aws-okta exec taos -- terraform apply
+```
 
 [webhooks]: https://docs.github.com/en/rest/reference/repos#webhooks
 [events]: https://docs.github.com/en/enterprise-server/actions/learn-github-actions/events-that-trigger-workflows

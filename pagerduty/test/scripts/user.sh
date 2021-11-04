@@ -30,16 +30,26 @@ popd
 # anyway.  Since, we've already enabled SSH agent forwarding, use the `insteadOf` key
 # in the global git config.
 # https://github.blog/2020-12-15-token-authentication-requirements-for-git-operations/
-cat << EOF > "$HOME/.gitconfig"
-[url "ssh://git@github.com/"]
-    insteadOf = https://github.com/
-EOF
+git config --global url."ssh://git@github.com/".insteadOf https://github.com/
 
 mkdir -p "$HOME/.aws"
 cat << EOF > "$HOME/.aws/credentials"
 [default]
 aws_access_key_id = $AWS_ACCESS_KEY_ID
 aws_secret_access_key = $AWS_SECRET_ACCESS_KEY
+EOF
+
+cat << EOF > "$HOME/.aws/config"
+[okta]
+aws_saml_url = home/amazon_aws/0oa1f26d64tYiXTl90h8/272
+mfa_provider = DUO
+mfa_factor_type = web
+
+[profile taos]
+role_arn = arn:aws:iam::622089341825:role/taos-engineer
+
+[profile taos-ro]
+role_arn = arn:aws:iam::622089341825:role/read-only
 EOF
 
 {

@@ -1,6 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+unless Vagrant.has_plugin?("vagrant-ohai")
+    vagrant plugin install vagrant-ohai
+end
+
 Vagrant.configure("2") do |config|
     config.vm.box = "ubuntu/focal64"
 #    config.vm.box = "bento/ubuntu-20.04"

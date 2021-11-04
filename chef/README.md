@@ -61,11 +61,21 @@ CHEF_USER=kilgore-trout \
 vagrant up
 ```
 
-## Create Cookbooks
+## Create Cookbooks and Cookbook Components
 
 ```
+chef generate repo chef-repo --chef-license accept-silent
 cd chef-repo
-chef generate cookbook cookbooks/derp
+chef generate cookbook cookbooks/foo
+cd cookbooks/foo
+chef generate recipe motd
+chef generate template motd
+```
+
+## Chef client run
+
+```
+sudo chef-client -zr "recipe[foo::motd]"
 ```
 
 [Hosted Chef]: https://manage.chef.io/login

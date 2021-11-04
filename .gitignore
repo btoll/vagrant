@@ -6,4 +6,6 @@ playbook.retry
 kubeadm-init.out
 
 env.sh
+.chef
+pd-internal-cookbooks.bz2
 

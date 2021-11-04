@@ -20,16 +20,24 @@ Vagrant.configure("2") do |config|
             AWS_DEFAULT_REGION:ENV["AWS_DEFAULT_REGION"],
 
             USER:ENV["USER"],
-            GITHUB_TOKEN:ENV["GITHUB_TOKEN"],
-            GITHUB_USER:ENV["GITHUB_USER"],
+
             GIT_HOST:ENV["GIT_HOST"],
-            GITHUB_REPO:ENV["GITHUB_REPO"],
+            GITHUB_TOKEN:ENV["GITHUB_TOKEN"],
+
+            TARGET_USER:ENV["TARGET_USER"],
+            TARGET_REPO:ENV["TARGET_REPO"],
+
+            JFROG_USERNAME:ENV["JFROG_USERNAME"],
+            JFROG_PASSWORD:ENV["JFROG_PASSWORD"],
+
             REPO_ALLOWLIST:ENV["REPO_ALLOWLIST"],
 
             CHEF_GITHUB_EMAIL:ENV["CHEF_GITHUB_EMAIL"],
             CHEF_GITHUB_USER:ENV["CHEF_GITHUB_USER"],
             CHEF_ORG:ENV["CHEF_ORG"],
             CHEF_USER:ENV["CHEF_USER"],
+            CHEF_REPO:ENV["CHEF_REPO"],
+            CHEF_BRANCH:ENV["CHEF_BRANCH"],
         }
     end
 

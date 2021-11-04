@@ -1,0 +1,7 @@
+FROM chef/chefworkstation:0.16.33
+
+COPY .chef ./.chef
+WORKDIR chef
+
+RUN knife cookbook bulk delete "^.*$" --purge --yes
+
