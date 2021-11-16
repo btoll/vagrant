@@ -254,18 +254,6 @@ aws-okta exec taos -- aws sts get-caller-identity
         /home/vagrant/.chef/cache/cookbooks/pd-consul/recipes/install.rb:64:in `from_file'
         /home/vagrant/.chef/cache/cookbooks/pd-consul/recipes/default.rb:11:in `from_file'
 
-## Docker
-
-```
-$ DOCKER_BUILDKIT=1 docker build \
-    --no-cache \
-    --progress plain \
-    --ssh default \
-    --secret id=mysecret1,src=btoll.pem \
-    --secret id=mysecret2,src=config.rb \
-    -t foo .
-```
-
 [webhooks]: https://docs.github.com/en/rest/reference/repos#webhooks
 [events]: https://docs.github.com/en/enterprise-server/actions/learn-github-actions/events-that-trigger-workflows
 [testing locally]: https://www.runatlantis.io/guide/testing-locally.html

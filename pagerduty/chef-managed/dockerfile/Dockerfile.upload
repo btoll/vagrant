@@ -1,24 +1,26 @@
-FROM chef/chefworkstation:0.16.33
+FROM chef/chefworkstation:stable
 
+ARG CHEF_REPO=pagerduty/chef
+ARG CHEF_BRANCH=master
+
+RUN apt-get update \
+    && apt-get install awscli -y
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-RUN --mount=type=ssh git clone git@github.com:pagerduty/chef.git /chef
+RUN --mount=type=ssh git clone --branch ${CHEF_BRANCH} git@github.com:${CHEF_REPO}.git /chef
 WORKDIR /chef
-COPY pd-internal-cookbooks.bz2 ./
-RUN mkdir .chef
-COPY .chef/ ./.chef
+COPY upload.bash internal-cookbooks.bz2 ./
 
-# Change download source to public supermarket.
-RUN sed -i "s/source artifactory.*/source \'https:\/\/supermarket.chef.io\'/g" Berksfile
-# Remove 3 internal PD cookbooks, we'll add them later (from `pd-cookbooks.tgz`).
-RUN sed -i '/^group.*internal_cookbooks/,/^end/{/^group/!{/^end/!d}}' Berksfile
+# Change download source to public supermarket and remove 3 internal cookbooks.
+# We'll add them later (from `internal-cookbooks.bz2`).
+RUN sed -i "s/source artifactory.*/source \'https:\/\/supermarket.chef.io\'/g" Berksfile \
+    && sed -i '/^group.*internal_cookbooks/,/^end/{/^group/!{/^end/!d}}' Berksfile \
+    && tar xjf internal-cookbooks.bz2
 
 RUN gem install bundler:2.2.17 \
     && berks install
-RUN tar xjf pd-internal-cookbooks.bz2
 
-#    && knife upload environments \
-RUN berks upload \
-    && knife cookbook upload --all -o internal-cookbooks:cookbooks:site-cookbooks \
-    && knife upload data_bags \
-    && knife upload roles
+ENV CHEF_REPO ${CHEF_REPO}
+ENV CHEF_BRANCH ${CHEF_BRANCH}
+
+ENTRYPOINT ["bash", "upload.bash"]
 

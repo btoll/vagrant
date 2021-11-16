@@ -1,7 +1,6 @@
-FROM chef/chefworkstation:0.16.33
-
-COPY .chef ./.chef
-WORKDIR chef
-
-RUN knife cookbook bulk delete "^.*$" --purge --yes
+FROM chef/chefworkstation:stable
+RUN apt-get update \
+    && apt-get install awscli -y
+COPY delete.bash ./delete.bash
+ENTRYPOINT ["bash", "delete.bash"]
 

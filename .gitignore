@@ -7,5 +7,5 @@ kubeadm-init.out
 
 env.sh
 .chef
-pd-internal-cookbooks.bz2
+internal-cookbooks.bz2
 
