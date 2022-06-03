@@ -1,0 +1,144 @@
+@media (max-width: 768px) {
+    .nav-container {
+        margin: 0 !important;
+    }
+    nav li a {
+        padding: 20px 7px !important;
+    }
+    aside {
+	display: none;
+	width: 0 !important;
+    }
+    article {
+        margin: 20px !important;
+    }
+}
+
+html, body, main {
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    margin: 80px 0 0 50px;
+}
+
+aside {
+    float: left;
+    margin-left: 20px;
+    padding: 0;
+    width: 250px;
+}
+
+article {
+    margin-left: 270px;
+}
+
+/* Account for different markup. */
+article h3 + p::first-letter,
+article p:nth-child(1)::first-letter {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+#contact article h3 + p::first-letter {
+    font-weight: normal;
+    font-size: inherit;
+}
+
+article .note {
+    background-color: #eee;
+    border: 1px solid #000;
+    color: #000;
+    margin: 10px;
+    padding: 10px;
+}
+
+aside figure {
+    margin: 0;
+    padding: 0;
+    position: fixed;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+nav {
+    background: #337ab7;
+    border: 1px solid #eee;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.nav-container {
+    margin: 0 0 0 15%;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    float: left;
+}
+
+nav li a {
+    background: #337ab7;
+    color: #fff;
+    display: block;
+    font-size: 1em;
+    padding: 20px 10px;
+    text-decoration: none;
+}
+
+nav > li a:hover {
+    background: #265a88;
+}
+
+/* Highlight the link of the current page. */
+#dictionary nav li a[href="/"],
+#pronunciation nav li a[href*="pronunciation"],
+#grammar nav li a[href*="grammar"],
+#links nav li a[href*="links"],
+#contact nav li a[href*="contact"] {
+    background: #265a88;
+}
+
+/* Hover menu */
+li.dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+li.dropdown ul {
+    background: #337ab7;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    display: none;
+    min-width: 160px;
+    position: absolute;
+    z-index: 1;
+}
+
+li.dropdown ul a {
+    display: block;
+    text-decoration: none;
+}
+
+li.dropdown ul li:hover {
+    background: #265a88;
+}
+
+li.dropdown:hover ul {
+    display: block;
+}
+

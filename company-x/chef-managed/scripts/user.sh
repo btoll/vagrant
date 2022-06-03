@@ -3,40 +3,6 @@
 
 set -euo pipefail
 
-# This is necessary to access the private repos (see README).
-ssh-keyscan -H github.com >> .ssh/known_hosts
-
-#REPOS=(
-#    pagerduty/pd-btoll-test
-#    pagerduty/pd-btoll-upgrade
-#    pagerduty/terraform-aws-autoscaling-group
-#    pagerduty/terraform-common
-#)
-
-GIT_PLATFORM=git@github.com
-
-#for repo in "${REPOS[@]}"
-#do
-#    if [ ! -d "$repo" ]
-#    then
-#        git clone "$GIT_PLATFORM:$repo" "$repo"
-#    fi
-#done
-
-git clone --branch "$CHEF_BRANCH" "$GIT_PLATFORM:$CHEF_REPO" pagerduty/chef
-
-# GitHub no longer supports account password authentication, which we don't want to do
-# anyway.  Since, we've already enabled SSH agent forwarding, use the `insteadOf` key
-# in the global git config.
-# https://github.blog/2020-12-15-token-authentication-requirements-for-git-operations/
-git config --global url."ssh://git@github.com/".insteadOf https://github.com/
-# For creating cookbooks.
-git config --global user.email "$CHEF_GITHUB_EMAIL"
-git config --global user.name "$CHEF_GITHUB_USER"
-
-# Let's create a test cookbook!
-#chef generate cookbook cookbooks/foo --chef-license accept-silent
-
 mkdir -p "$HOME/.aws"
 cat << EOF > "$HOME/.aws/credentials"
 [default]
@@ -92,34 +58,12 @@ EOF
     echo "export PATH=/usr/bin:$PATH" ;
 } >> "$HOME/.bashrc"
 
-if [ ! -d "$HOME/.asdf" ]
-then
-    # http://asdf-vm.com/guide/getting-started.html
-    #
-    # `advice.detachedHead=false` prevents the following warning(s) in `vagrant up` stdout:
-    #
-    #       default: You are in 'detached HEAD' state. You can look around, make experimental
-    #       default: changes and commit them, and you can discard any commits you make in this
-    #       default: state without impacting any branches by switching back to a branch.
-    #       ...
-    #
-    git clone -c advice.detachedHead=false https://github.com/asdf-vm/asdf.git .asdf --branch v0.8.1
+exit
 
-    # For `asdf`, `gem`, `bundle`, et al
-    PATH="$PATH:$HOME/.asdf/bin:$HOME/.asdf/shims"
 
-    (
-        echo ". $HOME/.asdf/asdf.sh" ;
-        echo ". $HOME/.asdf/completions/asdf.bash" ;
-    ) >> .bashrc
 
-    pushd "$HOME/pagerduty/chef"
-    asdf plugin-add ruby
-    asdf plugin-add terraform
-    asdf install
-    gem install bundler:2.2.17
-    popd
-fi
+
+
 
 ##################################
 ########## HOUSEKEEPING ##########

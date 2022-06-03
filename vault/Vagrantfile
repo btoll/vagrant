@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/focal64"
+    config.vm.network :forwarded_port, host: 8200, guest: 8200, auto_correct: true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.memory = 8192
+        vb.name = "vault"
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+        apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        apt-get update
+        apt-get install -y \
+            jq \
+            silversearcher-ag \
+            tree \
+            vault
+    SHELL
+
+   config.vm.post_up_message = "Hello, world!"
+end
+

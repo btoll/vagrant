@@ -96,7 +96,7 @@ fi
     echo "export JFROG_USERNAME=$JFROG_USERNAME" ;
     echo "export JFROG_PASSWORD=$JFROG_PASSWORD" ;
     echo "export ARTIFACTORY_REGISTRY_USER=$JFROG_USERNAME" ;
-    echo "export ARTIFACTORY_API_KEY==$JFROG_PASSWORD" ;
+    echo "export ARTIFACTORY_API_KEY=$JFROG_PASSWORD" ;
 
     # `/usr/bin` contains all the Chef Workstation binaries, else it will default to the `asdf` shims.
     echo "export PATH=/usr/bin:$PATH" ;

@@ -2,8 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-    # The `focal` image is throwing an exception, temporarily use `bionic`.
-    config.vm.box = "ubuntu/bionic64"
+    config.vm.box = "ubuntu/focal64"
 
     config.ssh.forward_agent = true
 

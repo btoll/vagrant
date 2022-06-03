@@ -40,7 +40,10 @@ This tool!
 
 ### Build
 
-Build two images:
+- Clones the repository and given branch into the image.
+- Downloads the cookbooks and their dependencies listed in the `Berksfile`.
+
+Build two images with defaults:
 
 - `chef.delete`
 - `chef.upload`
@@ -64,6 +67,8 @@ done
 
 ### Run
 
+Downloads the `identity.pem` and `config.rb` files from `S3` and uploads the cookbooks and cookbook components to the location of the Chef Infra Server in `config.rb`.
+
 ```
 docker run \
     --rm \
@@ -71,6 +76,15 @@ docker run \
     --env AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
     -it chef.upload \
     -i the_identity
+```
+
+When running, there is confirmation of the Chef repository and branch that is the source for the cookbooks and other components uploaded to the Chef Infra Server.
+
+```
+--------------------
+[upload.bash][INFO] Using Chef repository: pagerduty/chef
+[upload.bash][INFO]     Using Chef branch: testy
+--------------------
 ```
 
 ## More Chef Bullshit
@@ -86,6 +100,34 @@ knife bootstrap localhost \
     -i /home/kilgore-trout/projects/vagrantfiles/pagerduty/chef-managed/.vagrant/machines/default/virtualbox/private_key \
     -r "role[twistlock]" \
     --sudo \
-    -N testies
+    -N testies \
+    --yes
+
 ```
+
+`https://s3.amazonaws.com/pd-public-files/`
+
+```
+<Contents>
+<Key>packages/chef_14.13.11-1_amd64.xenial.deb</Key>
+<LastModified>2019-06-17T00:09:34.000Z</LastModified>
+<ETag>"af5f36649b424bd8430f9f5b9051b7c9-4"</ETag>
+<Size>30189144</Size>
+<StorageClass>STANDARD</StorageClass>
+</Contents>
+
+sudo chef-client -c "$HOME/.chef/config.rb" -j "$HOME/runlist.json" -l info --node-name btoll
+```
+
+Q. Where are the cookbooks?
+A. `/var/chef/cache/cookbooks`
+
+Q. How do I do another Chef run?
+A. `sudo chef-client`
+
+Q. How do I do another Chef run and not sync the cookbooks with those on the Chef Infra Server?
+A. `sudo chef-client --skip-cookbook-sync`
+
+Q. Where are the gems stored on the machine by default?
+A. `/opt/chef/embedded/lib/ruby/gems/2.6.0/gems/`
 

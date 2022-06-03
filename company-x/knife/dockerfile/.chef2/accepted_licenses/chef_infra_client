@@ -1,0 +1,8 @@
+---
+id: infra-client
+name: Chef Infra Client
+date_accepted: '2021-11-16T13:46:20-05:00'
+accepting_product: infra-client
+accepting_product_version: !ruby/string:ChefUtils::VersionString '15'
+user: btoll
+file_format: 1

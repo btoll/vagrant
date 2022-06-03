@@ -1,0 +1,65 @@
+<?php
+#written December 7, 2006
+#last modified May 3, 2008
+#this little script checks to see if the user came from a search engine,
+#and if they did to grab the search engine name and the keywords used
+#and throw 'em into the 'keywords' table in the 'benjamin_italy' database;
+
+function search_engine($referer, $which) {
+  $temp_array = array();
+  $temp_array2 = array();
+  $temp_array3 = array();
+  $temp_array4 = array();
+
+  $temp_array = explode('?', $referer);
+  $temp_array2 = explode('&', $temp_array[1]);
+  foreach ($temp_array2 as $keywords) {
+    if (strstr($keywords, $which)) {
+      $temp_array3 = explode('=', $keywords);
+      $temp_array4 = explode('+', $temp_array3[1]);
+      for ($i = 0; $i < count($temp_array4); $i++)
+        $words .= $temp_array4[$i] . ",";
+      return $words = rtrim($words, ",");
+    }
+  }
+}
+
+// set the engine and keywords session variables;
+if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != '') {
+  if (!strstr($_SERVER['HTTP_REFERER'], 'benjamintoll.com')) {
+    $words = '';
+    $engine = '';
+    $referer = '';
+
+    $referer = $_SERVER['HTTP_REFERER'];
+    if (strstr($referer, 'www.google.com')) {
+      $words = search_engine($referer, 'q=');
+      $engine = 'Google';
+    } elseif (strstr($referer, 'www.altavista.com')) {
+      $words = search_engine($referer, 'q=');
+      $engine = 'AltaVista';
+    } elseif (strstr($referer, 'www.ask.com')) {
+      $words = search_engine($referer, 'q=');
+      $engine = 'Ask';
+    } elseif (strstr($referer, 'search.msn.com')) {
+      $words = search_engine($referer, 'q=');
+      $engine = 'MSN';
+    } elseif (strstr($referer, 'search.yahoo.com')) {
+      $words = search_engine($referer, 'p=');
+      $engine = 'Yahoo';
+    } elseif (strstr($referer, 'search.lycos.com')) {
+      $words = search_engine($referer, 'query=');
+      $engine = 'Lycos';
+    }
+  }
+}
+
+if (isset($words) && $words != '' && isset($engine) && $engine != '') {
+  connect_db();
+  # the following fields are kid, engine, keywords, and timestamp;
+  //$sql = "INSERT INTO keywords VALUES (NULL, '$engine', '$words', NULL)";
+  $sql = sprintf("INSERT INTO keywords VALUES (NULL, '%s', '%s', NULL)", $engine, $words);
+  @mysql_query($sql);
+}
+
+?>

@@ -1,0 +1,12 @@
+Log created: 2021-11-30T04:51:40.656352000Z
+Process ID:  709556 (0xad3b4)
+Parent PID:  1 (0x1)
+Executable:  /usr/lib/virtualbox/VBoxHeadless
+Arg[0]: /usr/lib/virtualbox/VBoxHeadless
+Arg[1]: --comment
+Arg[2]: vault
+Arg[3]: --startvm
+Arg[4]: 8bb55bcf-c61e-4e40-b5fc-527f337825ea
+Arg[5]: --vrde
+Arg[6]: config
+AddRef: illegal refcnt=3221225469 state=2

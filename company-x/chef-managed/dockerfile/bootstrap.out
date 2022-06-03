@@ -1,0 +1,223 @@
+The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
+fingerprint is SHA256:MyO5k576peqjqPc/vOSA0Dv/o03OCrkaPqRwEmXcZKA.
+
+Are you sure you want to continue connecting
+? (Y/N) Node btoll exists, overwrite it? (Y/N) Client btoll exists, overwrite it? (Y/N)  [localhost] -----> Existing Chef Infra Client installation detected
+ [localhost] Starting the first Chef Infra Client Client run...
+ [localhost] Starting Chef Infra Client, version 15.17.4[0m
+ [localhost] resolving cookbooks for run list: ["hostname", "pd-vault::gem", "hosts", "pd-apparmor", "pd-consul", "pd-vault", "rvm::install", "pd-ntp", "logrotate", "pd-chef-client", "pd-chef-client::metrics", "pd-syslog-ng", "pd-base::pd-prompt", "pd-user", "pd-sudo", "pd-ssh", "fail2ban", "pd-ssh::motd", "pd-sysctl", "pd-topoman", "pd-iptables", "pd-datadog", "pd-datadog::iptables", "pd-datadog::xfrm_stat", "pd-packages", "pd-base", "pd-serf", "pd-auditd", "pd-consul::iptables", "pd-user::provisioner", "pd-kernel", "pd-base::bk_ssh_user", "pd-base::cpu_governor", "pd-twistlock::console", "pd-twistlock::default", "pd-twistlock::aws-nlb", "pd-nginx", "pd-consul-template"][0m
+ [localhost] 
+ [localhost] Synchronizing Cookbooks:[0m
+ [localhost] 
+ [localhost]   
+ [localhost] - hostname (0.0.2)[0m
+ [localhost]   - build-essential (8.2.1)[0m
+ [localhost]   - mingw (2.1.1)[0m
+ [localhost]   
+ [localhost] - chef-vault (4.0.3)[0m
+ [localhost] 
+ [localhost]   - pd-vault (0.0.1)[0m
+  - pd-certs (0.0.1)[0m
+ [localhost]   - windows (1.34.3)[0m
+ [localhost]   - ark (3.1.0)[0m
+ [localhost]   - certificate (1.0.0)[0m
+ [localhost]   
+ [localhost] - chef-client (3.3.8)[0m
+ [localhost] 
+ [localhost]   - seven_zip (3.1.2)[0m
+ [localhost]   - packagecloud (1.0.1)[0m
+ [localhost]   - logrotate (2.2.0)[0m
+  - pd-network-monitor (0.0.1)[0m
+  - pd-feature (0.1.2)[0m
+ [localhost]   - pd-base (0.0.1)[0m
+  - pd-conf_d (0.0.1)[0m
+ [localhost]   - aws (8.3.1)[0m
+ [localhost]   - pd-sumologic (0.0.1)[0m
+ [localhost]   - pd-cronner (0.0.1)[0m
+ [localhost]   - pd-artifactory (0.0.1)[0m
+ [localhost]   
+ [localhost] - cron (6.3.1)[0m
+ [localhost]   - pd-sudo (0.0.1)[0m
+ [localhost]   - pd-iptables (0.0.1)[0m
+ [localhost]   - pd-datadog (0.0.1)[0m
+ [localhost]   - chef_handler (3.0.3)[0m
+ [localhost]   
+ [localhost] - yum (5.1.0)[0m
+ [localhost] 
+ [localhost]   
+ [localhost] - poise-python (1.7.1)[0m
+ [localhost] 
+ [localhost]   - apt (7.1.1)[0m
+ [localhost]   - datadog (4.8.0)[0m
+ [localhost]   
+ [localhost] - pd_python (0.1.8)[0m
+ [localhost]   - poise-archive (1.5.0)[0m
+ [localhost]   - pd-route53 (0.0.1)[0m
+  - pd-cmdcom (0.0.1)[0m
+ [localhost]   - limits (1.0.0)[0m
+ [localhost]   
+ [localhost] - poise-languages (2.1.2)[0m
+ [localhost] 
+ [localhost]   - vim (2.0.2)[0m
+ [localhost]   - systemd (3.2.4)[0m
+ [localhost]   - poise (2.8.2)[0m
+  - pd-apparmor (0.0.1)[0m
+ [localhost]   - pd-aws-elb (0.0.1)[0m
+ [localhost]   
+ [localhost] - unattended-upgrades (0.1.2)[0m
+ [localhost] 
+ [localhost]   
+ [localhost] - pd-vault-config (1.3.0)[0m
+ [localhost] 
+ [localhost]   - pd-ntp (0.0.1)[0m
+ [localhost]   - apparmor (3.1.0)[0m
+ [localhost]   - user (0.7.0)[0m
+ [localhost]   - pd-user (0.0.1)[0m
+  - pd-ssh (0.0.1)[0m
+ [localhost]   - pd-syslog-ng (0.0.1)[0m
+ [localhost]   
+ [localhost] - pd-consul (0.0.1)[0m
+ [localhost] 
+ [localhost]   
+ [localhost] - pd-packages (0.0.1)[0m
+ [localhost]   - iptables (4.5.0)[0m
+ [localhost]   - fail2ban (5.0.2)[0m
+ [localhost]   - ntp (3.6.2)[0m
+ [localhost]   
+ [localhost] - pd-chef-client (0.0.1)[0m
+ [localhost] 
+ [localhost]   - pd-duosecurity (0.3.0)[0m
+ [localhost]   
+ [localhost] - pd-topoman (0.0.1)[0m
+ [localhost] 
+ [localhost]   - pd-auditd (0.0.1)[0m
+ [localhost]   - openssh (2.8.0)[0m
+ [localhost]   
+ [localhost] - pd-kernel (0.0.1)[0m
+ [localhost] 
+ [localhost]   - yum-epel (3.3.0)[0m
+ [localhost]   
+ [localhost] - auditd (0.1.8)[0m
+ [localhost]   - rvm (0.0.1)[0m
+ [localhost] 
+ [localhost]   - pd-serf (0.0.1)[0m
+ [localhost]   - hosts (0.0.1)[0m
+ [localhost]   - monit (1.5.4)[0m
+ [localhost]   - pd-sysctl (0.0.1)[0m
+ [localhost]   - pd-twistlock (0.0.1)[0m
+  - ohai (5.2.5)[0m
+ [localhost]   - pd-monit (0.0.1)[0m
+ [localhost]   - pd-consul-template (0.0.1)[0m
+ [localhost]   - pd-docker (0.0.1)[0m
+ [localhost]   
+ [localhost] - runit (5.1.1)[0m
+ [localhost] 
+ [localhost]   
+ [localhost] - pd-nginx (0.0.1)[0m
+ [localhost] 
+ [localhost]   - nginx (2.7.1)[0m
+Installing Cookbook Gems:[0m
+ [localhost] Compiling Cookbooks...[0m
+ [localhost] 
+ [localhost] [2021-11-16T19:05:08+00:00] WARN: dogapi gem is unavailable at compile time. If Vault is unavailable, it will not be reported to Datadog.
+ [localhost] [0m
+ [localhost] 
+ [localhost] ================================================================================[0m
+ [localhost] 
+ [localhost] [31mRecipe Compile Error in /var/chef/cache/cookbooks/pd-consul/libraries/search_helper.rb[0m
+ [localhost] 
+ [localhost] ================================================================================[0m
+ [localhost] 
+ [localhost] 
+[0m
+ [localhost] Gem::ConflictError[0m
+ [localhost] 
+ [localhost] ------------------[0m
+ [localhost] 
+ [localhost] Unable to activate diplomat-1.2.0, because faraday-1.3.1 conflicts with faraday (~> 0.9)[0m
+ [localhost] 
+ [localhost] 
+[0m
+ [localhost] Cookbook Trace:[0m
+ [localhost] 
+ [localhost] ---------------[0m
+ [localhost] 
+ [localhost]   /var/chef/cache/cookbooks/pd-consul/libraries/search_helper.rb:11:in `<top (required)>'[0m
+ [localhost] 
+ [localhost] 
+[0m
+ [localhost] Relevant File Content:[0m
+ [localhost] 
+ [localhost] ----------------------[0m
+ [localhost] 
+ [localhost] /var/chef/cache/cookbooks/pd-consul/libraries/search_helper.rb:
+[0m
+ [localhost] 
+[0m
+ [localhost]   4:  # limited in scope to facilitating service searches with PD-specific
+[0m
+ [localhost]   5:  # quirks like "best IP address" determination.
+[0m
+ [localhost]   6:  
+[0m
+ [localhost]   7:  # Copyright 2017 PagerDuty, Inc.
+[0m
+ [localhost]   8:  #
+[0m
+ [localhost]   9:  # All rights reserved.
+[0m
+ [localhost]  10:  
+[0m
+ [localhost]  11>> require 'diplomat'
+[0m
+ [localhost]  12:  
+[0m
+ [localhost]  13:  module PagerDuty
+[0m
+ [localhost]  14:    module ConsulSearchHelper
+[0m
+ [localhost]  15:      # datacenters accepts :local, :all, or an array of strings with DC names.
+[0m
+ [localhost]  16:      # Default behavior is the same as Consul's default search behavior.
+[0m
+ [localhost]  17:      # Tag is the Consul's service tag, useful if multiple instances
+[0m
+ [localhost]  18:      # of the service are in the same Consul cluster.
+[0m
+ [localhost]  19:      # If you want nodes that fail health checks, set "passing" to false.
+[0m
+ [localhost]  20:      def consul_search(service, datacenters: :local, tag: nil, passing: true)
+[0m
+ [localhost] 
+[0m
+ [localhost] System Info:[0m
+ [localhost] 
+ [localhost] ------------[0m
+ [localhost] 
+ [localhost] chef_version=15.17.4
+[0m
+ [localhost] platform=ubuntu
+[0m
+ [localhost] platform_version=20.04
+[0m
+ [localhost] ruby=ruby 2.6.7p197 (2021-04-05 revision 67941) [x86_64-linux]
+[0m
+ [localhost] program_name=/usr/bin/chef-client
+[0m
+ [localhost] executable=/opt/chef/bin/chef-client[0m
+ [localhost] 
+ [localhost] 
+[0m
+ [localhost] [0m
+ [localhost] 
+ [localhost] Running handlers:[0m
+ [localhost] 
+ [localhost] [2021-11-16T19:05:09+00:00] ERROR: Running exception handlers
+ [localhost] Running handlers complete
+[0m
+ [localhost] [2021-11-16T19:05:09+00:00] ERROR: Exception handlers complete
+ [localhost] Chef Infra Client failed. 0 resources updated in 06 seconds[0m
+ [localhost] 
+ [localhost] [2021-11-16T19:05:09+00:00] FATAL: Stacktrace dumped to /var/chef/cache/chef-stacktrace.out
+ [localhost] [2021-11-16T19:05:09+00:00] FATAL: Please provide the contents of the stacktrace.out file if you file a bug report
+ [localhost] [2021-11-16T19:05:09+00:00] FATAL: Gem::ConflictError: Unable to activate diplomat-1.2.0, because faraday-1.3.1 conflicts with faraday (~> 0.9)

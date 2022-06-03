@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#ls -1 > dirs.sh
+#$F-y0A ^[pImv ^[j
+#chmod +x dirs.sh
+
+mv apparmor-3.1.0 apparmor
+mv apt-7.1.1 apt
+mv ark-d2aa71777a01e6b211799c362a01d4a7d8903228 ark
+mv auditd-8919c73025cd2c82fc31ca5eea4b3353f72c40f8 auditd
+mv aws-8.3.1 aws
+mv boost-2.1.0 boost
+mv build-essential-8.2.1 build-essential
+mv certificate-1.0.0 certificate
+mv chef_client_updater-3.5.3 chef_client_updater
+mv chef_handler-3.0.3 chef_handler
+mv chef-ingredient-2.3.3 chef-ingredient
+mv chef-server-5.5.2 chef-server
+mv chef-vault-4.0.3 chef-vault
+mv cron-6.3.1 cron
+mv datadog-4.8.0 datadog
+mv deploy_resource-1.0.2 deploy_resource
+mv fail2ban-5.0.2 fail2ban
+mv git-10.1.0 git
+mv install_from-3.0.4 install_from
+mv iptables-4.5.0 iptables
+mv limits-1.0.0 limits
+mv line-2.3.2 line
+mv logrotate-2.2.0 logrotate
+mv lvm-4.5.3 lvm
+mv mingw-2.1.1 mingw
+mv nomad-2.3.0 nomad
+mv ntp-3.6.2 ntp
+mv ohai-5.2.5 ohai
+mv openssh-2.8.0 openssh
+mv openssl-8.5.5 openssl
+mv packagecloud-1.0.1 packagecloud
+mv pd-feature-0.1.2 pd-feature
+mv poise-2.8.2 poise
+mv poise-archive-1.5.0 poise-archive
+mv poise-languages-2.1.2 poise-languages
+mv poise-python-d76a8287d3cc9b7f1dad24150368015370e0888e poise-python
+mv postgresql-3.4.16 postgresql
+mv ruby_build-1.2.0 ruby_build
+mv ruby_rbenv-3.0.0 ruby_rbenv
+mv runit-5.1.1 runit
+mv seven_zip-3.1.2 seven_zip
+mv squid-4.1.0 squid
+mv systemd-3.2.4 systemd
+mv unattended-upgrades-0.1.2 unattended-upgrades
+mv user-0.7.0 user
+mv vim-2.0.2 vim
+mv xfs-2.0.1 xfs
+mv yum-5.1.0 yum
+mv yum-epel-3.3.0 yum-epel

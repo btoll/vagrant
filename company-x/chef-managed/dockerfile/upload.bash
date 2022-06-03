@@ -2,7 +2,15 @@
 
 set -eo pipefail
 
-while getopts "c:i:h" opt
+
+info() {
+    echo "--------------------"
+    echo "[$0] [INFO] Using Chef repository: $CHEF_REPO"
+    echo "[$0] [INFO]     Using Chef branch: $CHEF_BRANCH"
+    echo "--------------------"
+}
+
+while getopts "c:i:hv" opt
 do
     case "$opt" in
         h)
@@ -10,6 +18,10 @@ do
             ;;
         i)
             IDENTITY="$OPTARG"
+            ;;
+        v)
+            info
+            exit 0
             ;;
         ?)
             echo "Invalid option: -$OPTARG."
@@ -28,10 +40,7 @@ then
     exit 1
 fi
 
-echo "--------------------"
-echo "[$0][INFO] Using Chef repository: $CHEF_REPO"
-echo "[$0][INFO]     Using Chef branch: $CHEF_BRANCH"
-echo "--------------------"
+info
 
 mkdir .chef
 # The `--recursive` flag will grab the entire contents of the "directory".
