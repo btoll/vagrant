@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+BOX_IMAGE = "debian/bullseye64"
+CLUSTER_NAME = "Kubernetes Cluster"
+
+CONTROL_PLANE = "10.0.0.10"
+NODE_NETWORK_ADDRESS = "10.0.0"
+POD_CIDR = "10.85.0.0/16"
+
+WORKERS = 2
+CPU = 4
+MEMORY = 12288
+
+CALICO_VERSION = "3.25.0"
+
+# These variables and values are taken from:
+# https://github.com/cri-o/cri-o/blob/main/install.md#apt-based-operating-systems
+# https://kubernetes.io/releases/version-skew-policy/#supported-version-skew
+OS = "Debian_11"
+VERSION = "1.26"
+
+Vagrant.configure("2") do |config|
+    config.vm.box = BOX_IMAGE
+    config.ssh.forward_x11 = "false"
+
+    config.vm.provision "shell",
+        run: "always",
+        inline: "swapoff -a"
+
+    config.vm.define "control-plane" do |subconfig|
+        subconfig.vm.box = BOX_IMAGE
+        subconfig.vm.hostname = "control-plane"
+        subconfig.vm.network :private_network, ip: CONTROL_PLANE
+        subconfig.vm.provider :virtualbox do |vb|
+            vb.customize ["modifyvm", :id, "--cpus", CPU]
+            vb.customize ["modifyvm", :id, "--groups", ("/" + CLUSTER_NAME)]
+            vb.memory = MEMORY
+        end
+        subconfig.vm.provision "shell",
+            env: {
+                "NODE_IP" => CONTROL_PLANE,
+                "OS" => OS,
+                "VERSION" => VERSION
+            },
+            path: "scripts/common.sh"
+        subconfig.vm.provision "shell",
+            env: {
+                "API_ADV_ADDRESS" => CONTROL_PLANE,
+                "CALICO_VERSION" => CALICO_VERSION,
+                "POD_CIDR" => POD_CIDR
+            },
+            path: "scripts/control_plane.sh"
+    end
+
+    (0..WORKERS-1).each do |i|
+        config.vm.define "worker-#{i}" do |subconfig|
+            subconfig.vm.box = BOX_IMAGE
+            subconfig.vm.hostname = "worker-#{i}"
+            subconfig.vm.network :private_network, ip: NODE_NETWORK_ADDRESS + ".#{i + 20}"
+            subconfig.vm.provider :virtualbox do |vb|
+                vb.customize ["modifyvm", :id, "--cpus", CPU]
+                vb.customize ["modifyvm", :id, "--groups", ("/" + CLUSTER_NAME)]
+                vb.memory = MEMORY
+            end
+            subconfig.vm.provision "shell",
+              env: {
+                  "NODE_IP" => NODE_NETWORK_ADDRESS + ".#{i + 20}",
+                  "OS" => OS,
+                  "VERSION" => VERSION
+              },
+              path: "scripts/common.sh"
+            subconfig.vm.provision "shell",
+              path: "scripts/worker.sh"
+        end
+    end
+end
+

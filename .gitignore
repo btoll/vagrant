@@ -9,3 +9,6 @@ env.sh
 .chef
 internal-cookbooks.bz2
 
+.kube
+secret
+
