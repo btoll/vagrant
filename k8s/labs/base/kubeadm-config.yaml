@@ -1,0 +1,6 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: 1.26.1
+controlPlaneEndpoint: 10.0.0.10
+networking:
+  podSubnet:  10.85.0.0/16

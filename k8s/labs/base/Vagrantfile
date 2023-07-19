@@ -1,14 +1,27 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-#
-BOX_IMAGE = "debian/bullseye64"
+
+unless Vagrant.has_plugin?("vagrant-disksize")
+    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
+#BOX_IMAGE = "debian/bullseye64"
+BOX_IMAGE = "ubuntu/focal64"
 CLUSTER_NAME = "Kubernetes Cluster"
 
-CONTROL_PLANE = "10.0.0.10"
+CONTROL_PLANE_IP = "10.0.0.10"
+CONTROL_PLANE_NAME = "cp"
 NODE_NETWORK_ADDRESS = "10.0.0"
-POD_CIDR = "10.85.0.0/16"
+# This is the value of CALICO_IPV4POOL_CIDR in the Calico resource file
+# (downloaded in the control_plane.sh script).
+# It must be passed to `kubeadm init` (unless it's in the cluster resource).
+# If the values aren't commented out in the resource file, the CIDR range
+# passed to `kubeadm init` **must** match what's in the resource file
+# (well, depending on the CNI).
+#POD_CIDR = "10.85.0.0/16"
+POD_CIDR = "192.168.0.0/16"
 
-WORKERS = 2
+WORKERS = 1
 CPU = 4
 MEMORY = 12288
 
@@ -17,12 +30,15 @@ CALICO_VERSION = "3.25.0"
 # These variables and values are taken from:
 # https://github.com/cri-o/cri-o/blob/main/install.md#apt-based-operating-systems
 # https://kubernetes.io/releases/version-skew-policy/#supported-version-skew
-OS = "Debian_11"
+#OS = "Debian_11"
+OS = "xUbuntu_20.04"
 VERSION = "1.26"
 
 Vagrant.configure("2") do |config|
     config.vm.box = BOX_IMAGE
     config.ssh.forward_x11 = "false"
+    config.disksize.size = "50GB"
+
 
     config.vm.provision "shell",
         run: "always",
@@ -30,23 +46,27 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "control-plane" do |subconfig|
         subconfig.vm.box = BOX_IMAGE
-        subconfig.vm.hostname = "control-plane"
-        subconfig.vm.network :private_network, ip: CONTROL_PLANE
+        subconfig.vm.hostname = "cp"
+        subconfig.vm.network :private_network, ip: CONTROL_PLANE_IP
         subconfig.vm.provider :virtualbox do |vb|
             vb.customize ["modifyvm", :id, "--cpus", CPU]
             vb.customize ["modifyvm", :id, "--groups", ("/" + CLUSTER_NAME)]
+            vb.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
             vb.memory = MEMORY
         end
         subconfig.vm.provision "shell",
             env: {
-                "NODE_IP" => CONTROL_PLANE,
+                "CONTROL_PLANE_IP" => CONTROL_PLANE_IP,
+                "CONTROL_PLANE_NAME" => CONTROL_PLANE_NAME,
+                "NODE_IP" => CONTROL_PLANE_IP,
                 "OS" => OS,
                 "VERSION" => VERSION
             },
             path: "scripts/common.sh"
         subconfig.vm.provision "shell",
             env: {
-                "API_ADV_ADDRESS" => CONTROL_PLANE,
+                "CONTROL_PLANE_IP" => CONTROL_PLANE_IP,
+                "CONTROL_PLANE_NAME" => CONTROL_PLANE_NAME,
                 "CALICO_VERSION" => CALICO_VERSION,
                 "POD_CIDR" => POD_CIDR
             },
@@ -65,6 +85,8 @@ Vagrant.configure("2") do |config|
             end
             subconfig.vm.provision "shell",
               env: {
+                  "CONTROL_PLANE_IP" => CONTROL_PLANE_IP,
+                  "CONTROL_PLANE_NAME" => CONTROL_PLANE_NAME,
                   "NODE_IP" => NODE_NETWORK_ADDRESS + ".#{i + 20}",
                   "OS" => OS,
                   "VERSION" => VERSION

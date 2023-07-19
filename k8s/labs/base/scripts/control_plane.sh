@@ -4,7 +4,27 @@ set -euxo pipefail
 
 kubeadm config images pull
 
-kubeadm init --pod-network-cidr "$POD_CIDR" --apiserver-advertise-address "$API_ADV_ADDRESS" --cri-socket=unix:///var/run/crio/crio.sock | tee /vagrant/kubeadm-init.out
+# Use `--control-plane-endpoint` for HA instead of `--apiserver-advertise-address`.
+# It can be the name of the control plane, which later can be swapped out for a
+# load balancer.
+#
+# Also, the `--pod-network-cidr` value may need to match the CNI's CIDR IP pool
+# range.  This can be specified in a ClusterConfiguration resource in
+# `networking/podSubnet` field.
+#    --apiserver-advertise-address="$CONTROL_PLANE_IP" \
+#kubeadm init \
+#    --control-plane-endpoint "$CONTROL_PLANE_IP" \
+#    --cri-socket=unix:///var/run/crio/crio.sock \
+#    --pod-network-cidr "$POD_CIDR" \
+#    | tee /vagrant/kubeadm-init.out
+
+#    --node-name $HOST_NAME \
+kubeadm init \
+    --apiserver-advertise-address="$CONTROL_PLANE_IP" \
+    --apiserver-cert-extra-sans="$CONTROL_PLANE_IP" \
+    --cri-socket=unix:///var/run/crio/crio.sock \
+    --pod-network-cidr=172.16.0.0/16 \
+    | tee /vagrant/kubeadm-init.out
 
 # Note instead of capturing the output of `kubeadmin init` in the `kubeadm-init.out`
 # file, we could just run the command below and send its output to a file.
@@ -13,7 +33,8 @@ kubeadm init --pod-network-cidr "$POD_CIDR" --apiserver-advertise-address "$API_
 #       kubeadm token create --print-join-command
 #
 # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-token/#options
-
+#
+# Also, `kubeadm token list`
 mkdir /home/vagrant/.kube
 cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown vagrant:vagrant /home/vagrant/.kube/config

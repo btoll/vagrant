@@ -20,13 +20,13 @@ modprobe overlay
 modprobe br_netfilter
 
 # sysctl params required by setup, params persist across reboots
-cat <<EOF | tee /etc/sysctl.d/k8s.conf
+cat <<EOF | tee /etc/sysctl.d/kubernetes.conf
 net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward                 = 1
 EOF
 
-# Apply sysctl params without reboot
+# Apply sysctl params without reboot (make sure kernel is aware of changes).
 sysctl --system
 
 apt-get update && \
@@ -115,7 +115,7 @@ apt-mark hold \
 # https://github.com/kubernetes/kubernetes/issues/63702#issuecomment-474948254
 echo "KUBELET_EXTRA_ARGS=--node-ip=$NODE_IP" > /etc/default/kubelet
 
-# This sets up `kubectl` and `helm` autocompletion.
+# This sets up `kubectl` autocompletion.
 tee -a /home/vagrant/.bashrc << EOF
 # https://kubernetes.io/docs/reference/kubectl/cheatsheet/#bash
 if command -v kubectl > /dev/null
@@ -125,4 +125,12 @@ then
     complete -o default -F __start_kubectl k
 fi
 EOF
+
+# TODO:
+# - augment /etc/hosts for every worker node
+#
+# Adding the control plane hostname for every node at least allows
+# for a HA cluster once if a load balancer is ever placed in front
+# of the control plane(s).
+echo "$CONTROL_PLANE_IP $CONTROL_PLANE_NAME" >> /etc/hosts
 
