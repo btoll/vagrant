@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bullseye64"
+    config.vm.hostname = "vagrant-debian"
+    config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder "/home/btoll/dotfiles", "/vagrant/dotfiles"
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 2
+        vb.memory = 8192
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+    SHELL
+end
+
