@@ -1,0 +1,49 @@
+---
+- name: Change ownership of web root
+  shell: |
+    chown -R vagrant:vagrant /usr/share/nginx/html
+  become: true
+
+- name: Remove default index.html
+  file:
+    path: /usr/share/nginx/html/index.html
+    state: absent
+
+- name: Git checkout
+  git:
+    repo: "https://github.com/btoll/italy.git"
+    dest: /usr/share/nginx/html
+    version: main
+
+- name: Create db directory
+  file:
+    path: /usr/share/nginx/html/db
+    state: directory
+    mode: "0755"
+
+- name: Git checkout
+  git:
+    repo: "https://github.com/ADOdb/ADOdb.git"
+    dest: /usr/share/nginx/html/db/adodb5
+    version: master
+
+- name: Move database credentials to managed host
+  template:
+    src: italy.php.j2
+    dest: /usr/share/nginx/html/db/italy.php
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: Move mysql dump to managed host
+  template:
+    src: italy.sql.j2
+    dest: /home/vagrant/italy.sql
+
+- name: Restore database
+  shell: |
+    mysql -u root mysql < /home/vagrant/italy.sql
+  become: true
+

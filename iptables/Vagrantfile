@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://www.digitalocean.com/community/tutorials/how-to-forward-ports-through-a-linux-gateway-with-iptables
+
+NODES = 2
+
+Vagrant.configure("2") do |config|
+    (0..NODES-1).each do |i|
+        config.vm.define "node#{i}" do |subconfig|
+            subconfig.vm.box =  "debian/bullseye64"
+            subconfig.vm.hostname = "node#{i}"
+
+            subconfig.vm.network "public_network", ip: "192.168.1" + ".#{100 + i}", bridge: "wlp3s0"
+            subconfig.vm.network "private_network", ip: "10.0.10" + ".#{100 + i}"
+
+            subconfig.vm.synced_folder ".", "/vagrant"
+            subconfig.vm.synced_folder "/home/btoll/dotfiles", "/vagrant/dotfiles"
+
+            subconfig.ssh.forward_agent = true
+
+            subconfig.vm.provider :virtualbox do |vb|
+                vb.cpus = 4
+                vb.gui = false
+                vb.memory = 8192
+            end
+
+            subconfig.vm.provision "shell", inline: <<-SHELL
+                apt-get update
+
+                # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+                # Also, fixes the same warnings for Perl.
+                localedef -i en_US -f UTF-8 en_US.UTF-8
+            SHELL
+        end
+    end
+end
+

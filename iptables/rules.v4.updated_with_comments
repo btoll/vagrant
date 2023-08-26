@@ -1,0 +1,111 @@
+*filter
+# Allow all outgoing, but drop incoming and forwarding packets by default
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# Custom per-protocol chains
+:UDP - [0:0]
+:TCP - [0:0]
+:ICMP - [0:0]
+
+# Acceptable UDP traffic
+
+# Acceptable TCP traffic
+-A TCP -p tcp --dport 22 -j ACCEPT
+
+# Acceptable ICMP traffic
+
+# Boilerplate acceptance policy
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+
+# Drop invalid packets
+-A INPUT -m conntrack --ctstate INVALID -j DROP
+
+# Pass traffic to protocol-specific chains
+## Only allow new connections (established and related should already be handled)
+## For TCP, additionally only allow new SYN packets since that is the only valid
+## method for establishing a new TCP connection
+-A INPUT -p udp -m conntrack --ctstate NEW -j UDP
+-A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
+-A INPUT -p icmp -m conntrack --ctstate NEW -j ICMP
+
+# Reject anything that's fallen through to this point
+## Try to be protocol-specific w/ rejection message
+-A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
+-A INPUT -p tcp -j REJECT --reject-with tcp-reset
+-A INPUT -j REJECT --reject-with icmp-proto-unreachable
+
+# Rules to forward port 80 to our web server
+
+# Web server network details:
+
+# * Public IP Address: 203.0.113.1
+# * Private IP Address: 10.0.0.1
+# * Public Interface: eth0
+# * Private Interface: eth1
+# 
+# Firewall network details:
+# 
+# * Public IP Address: 203.0.113.2
+# * Private IP Address: 10.0.0.2
+# * Public Interface: eth0
+# * Private Interface: eth1
+-A FORWARD -i eth0 -o eth1 -p tcp --syn --dport 80 -m conntrack --ctstate NEW -j ACCEPT
+-A FORWARD -i eth0 -o eth1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A FORWARD -i eth1 -o eth0 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# End of Forward filtering rules
+
+# Commit the changes
+
+COMMIT
+
+*raw
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+# Rules to translate requests for port 80 of the public interface
+# so that we can forward correctly to the web server using the
+# private interface.
+
+# Web server network details:
+
+# * Public IP Address: 203.0.113.1
+# * Private IP Address: 10.0.0.1
+# * Public Interface: eth0
+# * Private Interface: eth1
+# 
+# Firewall network details:
+# 
+# * Public IP Address: 203.0.113.2
+# * Private IP Address: 10.0.0.2
+# * Public Interface: eth0
+# * Private Interface: eth1
+-A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.0.1
+-A POSTROUTING -d 10.0.0.1 -o eth1 -p tcp --dport 80 -j SNAT --to-source 10.0.0.2
+# End of NAT translations for web server traffic
+COMMIT
+
+*security
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT
+
+

@@ -1,0 +1,77 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bullseye64"
+    config.vm.hostname = "vagrant-eks"
+
+#    config.vm.network "forwarded_port", guest: 80, host: 8080
+#    config.vm.network "private_network", ip: "192.168.33.10"
+
+    config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder "/home/btoll/dotfiles", "/vagrant/dotfiles"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 4
+        vb.gui = false
+        vb.memory = "8192"
+        vb.name = "eks"
+    end
+
+#    config.vm.provision :shell do |s|
+#        s.path = "scripts/root.sh"
+#        s.env = {
+#            USER:ENV["USER"],
+#        }
+#    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update && \
+        apt-get install -y \
+            curl \
+            gnupg \
+            ntp \
+            unzip
+
+        # aws cli
+        # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        ./aws/install
+#        chown -R $(id -u):$(id -g) /usr/local/aws-cli/
+        chown -R vagrant:vagrant /usr/local/aws-cli/
+
+        # kubectl
+        # https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+        curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl
+        chmod +x kubectl
+        mv kubectl /usr/local/bin
+
+        # IAM authenticator
+        # https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
+        curl -Lo aws-iam-authenticator \
+          https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
+        chmod +x aws-iam-authenticator
+        mv aws-iam-authenticator /usr/local/bin
+        #aws configure
+
+        # eksctl
+        # https://eksctl.io/
+        # https://github.com/eksctl-io/eksctl/blob/main/README.md#installation
+        ARCH=amd64
+        PLATFORM=$(uname -s)_$ARCH
+        curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+        # Optional, verify checksum.
+        curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" \
+          | grep $PLATFORM \
+          | sha256sum --check
+        tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+        mv /tmp/eksctl /usr/local/bin
+        #eksctl get clusters
+        #eksctl create cluster
+    SHELL
+end
+
+

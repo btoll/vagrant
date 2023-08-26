@@ -17,6 +17,11 @@ br_netfilter
 EOF
 
 modprobe overlay
+# Newer kernels require kernel parameters to be set in order for
+# iptables to intercept traffic over bridged networks.
+#
+# https://github.com/omribahumi/libvirt_metadata_api/pull/4/files
+# https://wiki.libvirt.org/Net.bridge.bridge-nf-call_and_sysctl.conf.html
 modprobe br_netfilter
 
 # sysctl params required by setup, params persist across reboots

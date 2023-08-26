@@ -1,0 +1,3 @@
+insert into words values ("razziale", "rat'tsjale", "adjective", "racial");
+select * from words where pronunciation like '%tsjal%';
+update words set italian = "l'idoneita'" where pronunciation = "idonei'ta";

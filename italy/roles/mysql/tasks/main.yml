@@ -1,0 +1,14 @@
+---
+- name: Installing MySQL
+  apt:
+    update_cache: yes
+    cache_valid_time: 21600 # 6 hours.
+    pkg: "{{ packages }}"
+    state: present
+
+- name: Configure MySQL service
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+

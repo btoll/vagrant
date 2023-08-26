@@ -1,0 +1,14 @@
+---
+- name: Installing PHP
+  apt:
+    update_cache: yes
+    cache_valid_time: 21600 # 6 hours.
+    pkg: "{{ packages }}"
+    state: present
+
+- name: Configure php7.2-fpm service
+  service:
+    name: php7.2-fpm
+    state: started
+    enabled: yes
+

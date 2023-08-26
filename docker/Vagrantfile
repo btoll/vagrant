@@ -23,7 +23,8 @@ Vagrant.configure("2") do |config|
             ca-certificates \
             curl \
             git \
-            gnupg
+            gnupg \
+            tcpdump
 
         # https://docs.docker.com/engine/install/debian/
         install -m 0755 -d /etc/apt/keyrings

@@ -1,0 +1,9 @@
+---
+packages:
+  - php-pear
+  - php7.2
+  - php7.2-cli
+  - php7.2-curl
+  - php7.2-fpm
+  - php7.2-mysql
+
