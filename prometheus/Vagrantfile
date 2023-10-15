@@ -1,0 +1,101 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+NODES = 3
+
+Vagrant.configure("2") do |config|
+    (0..NODES-1).each do |i|
+        config.vm.define "node#{i}" do |subconfig|
+            subconfig.vm.box = "debian/bullseye64"
+
+            subconfig.vm.network "public_network", ip: "192.168.1" + ".#{100 + i}", bridge: "wlp3s0"
+
+            if i == 0
+                subconfig.vm.hostname = "prometheus"
+                subconfig.vm.network "forwarded_port",
+                    guest: 9090,
+                    guest_ip: "192.168.1" + ".#{100 + i}",
+                    host: 9090 # prometheus
+            end
+
+            if i > 0
+                subconfig.vm.hostname = "node#{i}"
+#                subconfig.vm.network "forwarded_port",
+#                    guest: 9100,
+#                    guest_ip: "192.168.1" + ".#{100 + i}",
+#                    host: "9099" + #{i}  # node_exporter
+            end
+
+            subconfig.vm.synced_folder ".", "/vagrant"
+            subconfig.ssh.forward_agent = true
+
+            subconfig.vm.provider "virtualbox" do |vb|
+                vb.cpus = 8
+                vb.gui = false
+                vb.memory = 8192
+                vb.name = "prometheus#{i}"
+            end
+
+            subconfig.vm.provision "shell", inline: <<-SHELL
+                apt-get update && \
+                apt-get install -y \
+                    build-essential \
+                    curl \
+                    git \
+                    gnupg2 \
+                    wget
+
+                # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+                # Also, fixes the same warnings for Perl.
+                localedef -i en_US -f UTF-8 en_US.UTF-8
+            SHELL
+
+            if i == 0
+                subconfig.vm.provision "shell", inline: <<-SHELL
+                    useradd --no-create-home --shell /bin/false prometheus
+
+                    # Prometheus.
+                    wget -O- \
+                        https://github.com/prometheus/prometheus/releases/download/v2.47.1/prometheus-2.47.1.linux-amd64.tar.gz \
+                        | tar -xzf - -C /usr/local
+
+                    mkdir /etc/prometheus /var/lib/prometheus
+                    cp -r /usr/local/prometheus-2.47.1.linux-amd64/{consoles,console_libraries,prometheus.yml} /etc/prometheus
+                    cp /vagrant/{node_exporter.crt,prometheus.yml} /etc/prometheus
+
+                    chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
+
+                    # Systemd.
+                    cp /vagrant/prometheus.service /etc/systemd/system
+                    systemctl daemon-reload
+                    systemctl enable prometheus
+                    systemctl start prometheus
+                SHELL
+            end
+
+            if i > 0
+                subconfig.vm.provision "shell", inline: <<-SHELL
+                    useradd --no-create-home --shell /bin/false node_exporter
+
+                    # Node Exporter.
+                    wget -O- \
+                        https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz \
+                        | tar -xzf - -C /usr/local
+
+                    chown -R node_exporter:node_exporter /usr/local/node_exporter-1.6.1.linux-amd64
+
+                    mkdir /etc/node-exporter
+                    cp /vagrant/{node_exporter.*,config.yml} /etc/node-exporter
+                    chown -R node_exporter:node_exporter /etc/node-exporter
+
+                    # Systemd.
+                    cp /vagrant/node_exporter.service /etc/systemd/system
+                    systemctl daemon-reload
+                    systemctl enable node_exporter
+                    systemctl start node_exporter
+                SHELL
+            end
+        end
+    end
+end
+
