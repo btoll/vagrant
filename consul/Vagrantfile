@@ -1,19 +1,144 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+NODES = 6
+
 Vagrant.configure("2") do |config|
-    config.vm.box = "ubuntu/bionic64"
+    (0..NODES-1).each do |i|
+        config.vm.define "node#{i}" do |node|
+            node.vm.box =  "debian/bookworm64"
+            node.vm.hostname = "node#{i}"
 
-    config.vm.provider "virtualbox" do |vb|
-        vb.memory = 8192
-        vb.name = "consul"
+            node.vm.network "private_network", ip: "10.0.10" + ".#{100 + i}"
+
+            node.vm.synced_folder ".", "/vagrant"
+            node.ssh.forward_agent = true
+
+            node.vm.provider :virtualbox do |vb|
+                vb.cpus = 4
+                vb.gui = false
+                vb.memory = 8192
+                vb.name = "consul#{i}"
+            end
+
+            node.vm.provision "shell", inline: <<-SHELL
+                apt-get update && \
+                apt-get install -y \
+                    build-essential \
+                    curl \
+                    git \
+                    gnupg2 \
+                    wget
+
+                # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+                # Also, fixes the same warnings for Perl.
+                localedef -i en_US -f UTF-8 en_US.UTF-8
+            SHELL
+
+            if i == 0
+                node.vm.provision "shell", inline: <<-SHELL
+                    # Install Consul.
+                    curl --fail --silent --show-error --location https://apt.releases.hashicorp.com/gpg | \
+                        gpg --dearmor | \
+                        dd of=/usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+                       tee -a /etc/apt/sources.list.d/hashicorp.list
+
+                    apt-get update && \
+                        apt-get install consul
+
+                    mkdir -p /opt/consul
+
+                    # Generate the gossip encryption key.
+                    consul keygen > /opt/consul/gossip_encryption_key
+
+                    # Generate TLS certs for RPC encryption.
+                    mkdir -p /opt/consul/certs && cd $_
+
+                    # ...create the CA...
+                    consul tls ca create
+
+                    # ...create the server certs...
+                    consul tls cert create -server -dc dc1 -domain consul
+
+                    # Distributing the certs to agents.
+                    # For server agent, distribute:
+                    #     - CA file, server cert and server private key
+                    # For client agent using auto-encrypt (recommended), distribute:
+                    #     - CA file only
+
+                    cat << EOF > /etc/consul.d/server.hcl
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#server-specific-configuration
+server = true
+bootstrap_expect = 3
+
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#consul-addresses
+bind_addr = "10.0.10.100"
+
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#tls-configuration
+tls {
+   defaults {
+      ca_file = "/opt/consul/certs/consul-agent-ca.pem"
+      cert_file = "/opt/consul/certs/dc1-server-consul-0.pem"
+      key_file = "/opt/consul/certs/dc1-server-consul-0-key.pem"
+
+      verify_incoming = true
+      verify_outgoing = true
+   }
+   internal_rpc {
+      verify_server_hostname = true
+   }
+}
+
+auto_encrypt {
+  allow_tls = true
+}
+
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#consul-ui
+ui_config {
+  enabled = true
+}
+EOF
+
+                    cat << EOF > /etc/consul.d/consul.hcl
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-consul-agents
+datacenter = "dc1"
+data_dir = "/opt/consul"
+encrypt = $(< /opt/consul/gossip_encryption_key)
+
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#tls-configuration
+tls {
+   defaults {
+      ca_file = "/opt/consul/certs/consul-agent-ca.pem"
+
+      verify_incoming = true
+      verify_outgoing = true
+   }
+   internal_rpc {
+      verify_server_hostname = true
+   }
+}
+
+auto_encrypt {
+  tls = true
+}
+
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#datacenter-auto-join
+retry_join = ["10.0.10.100"]
+
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#enable-consul-acls
+acl {
+  enabled = true
+  default_policy = "deny"
+  enable_token_persistence = true
+}
+EOF
+                    chmod 640 /etc/consul.d/consul.hcl
+                    chown -R consul:consul /etc/consul.d
+                SHELL
+            end
+        end
     end
-
-    config.vm.provision "shell", inline: <<-SHELL
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
-        apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        apt-get update
-        apt-get install -y consul
-    SHELL
 end
 

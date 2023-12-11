@@ -1,0 +1,92 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://developer.hashicorp.com/consul/tutorials/kubernetes/kubernetes-minikube
+
+unless Vagrant.has_plugin?("vagrant-disksize")
+    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bookworm64"
+    config.vm.hostname = "vagrant-kubernetes-consul-service-mesh"
+    config.disksize.size = "50GB"
+
+    config.vm.network "public_network", ip: "192.168.1.53", bridge: "wlp3s0"
+    config.vm.network "forwarded_port", guest: 9002, host: 9002
+#    config.vm.network "private_network", ip: "192.168.33.10"
+
+    config.vm.synced_folder ".", "/vagrant"
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 4
+        vb.gui = false
+        vb.memory = 8192
+        vb.name = "kubernetes-consul-service-mesh"
+    end
+
+#    config.vm.provision :shell do |s|
+#        s.path = "scripts/root.sh"
+#        s.env = {
+#            USER:ENV["USER"],
+#        }
+#    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update && \
+        apt-get install -y \
+            build-essential \
+            curl \
+            git \
+            gnupg2 \
+            wget
+
+        # Minikube
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+        dpkg -i minikube_latest_amd64.deb
+
+        # Kubectl
+        apt-get install -y \
+            apt-transport-https \
+            ca-certificates \
+            curl
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg
+        chmod 644 /usr/share/keyrings/kubernetes-apt-keyring.gpg
+        echo 'deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+        apt-get update && apt-get install -y kubectl
+
+        # Helm
+#		curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null
+#        apt-get install -y apt-transport-https
+#        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+#        apt-get update && apt-get install helm
+
+        # Consul
+#        wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+#        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+#        apt update && apt install consul
+
+        # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+        # Also, fixes the same warnings for Perl.
+        localedef -i en_US -f UTF-8 en_US.UTF-8
+    SHELL
+
+    config.vm.provision :ansible_local do |ansible|
+        ansible.become = true
+        ansible.groups = {
+            "servers" => ["default"]
+        }
+
+        ansible.compatibility_mode = "2.0"
+        ansible.playbook = "playbook.yml"
+        ansible.version = "latest"
+        ansible.extra_vars = {
+            ansible_python_interpreter: "/usr/bin/python3"
+        }
+        ansible.galaxy_roles_path = nil
+        ansible.galaxy_role_file = "requirements.yml"
+        ansible.galaxy_command = "ansible-galaxy install --role-file=%{role_file} --roles-path=%{roles_path}"
+    end
+end
+

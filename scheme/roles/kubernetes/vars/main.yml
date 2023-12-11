@@ -1,0 +1,6 @@
+---
+packages:
+  - kubeadm
+  - kubectl
+  - kubelet
+

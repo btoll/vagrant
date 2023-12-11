@@ -1,0 +1,16 @@
+---
+packages:
+  - ansible
+  - build-essential
+  - git
+  - haveged
+  - konsole
+  - libreoffice
+  - python3-pip
+  - python3.9
+  - shellcheck
+  - tree
+  - vagrant
+  - vim
+  - virtualenvwrapper
+

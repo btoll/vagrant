@@ -1,0 +1,43 @@
+---
+- name: Installing Prerequisites for Docker
+  apt:
+    update_cache: yes
+    cache_valid_time: 21600 # 6 hours.
+    pkg: "{{ packages['prereq'] }}"
+    state: present
+
+- name: Add Docker’s official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable
+    state: present
+    filename: docker
+    mode: 0600
+
+- name: Install Docker Engine.
+  apt:
+    pkg: "{{ packages['engine'] }}"
+    state: present
+
+- name: Add user to docker group
+  user:
+    name: vagrant
+    groups: docker
+    append: yes
+
+- name: Download and install docker-compose {{ DOCKER_COMPOSE_VERSION }}
+  get_url:
+    url : https://github.com/docker/compose/releases/download/{{ DOCKER_COMPOSE_VERSION }}/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: "+x"
+  become: true
+
+- name: Enable service docker and enable persistently
+  service:
+    name: docker
+    enabled: yes
+

@@ -1,0 +1,3 @@
+REDIS_HOST=redis-15396.c85.us-east-1-2.ec2.cloud.redislabs.com
+REDIS_PORT=15396
+REDIS_PW=CINAsJbBHvJb2uZwohPbn7U2swpSe2e6

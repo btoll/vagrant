@@ -1,0 +1,17 @@
+---
+- src: https://github.com/btoll/ansible-role-common
+  version: main
+  name: common
+
+- src: https://github.com/btoll/ansible-role-docker
+  version: main
+  name: docker
+
+- src: https://github.com/btoll/ansible-role-kubernetes
+  version: main
+  name: kubernetes
+
+- src: https://github.com/btoll/ansible-role-nginx
+  version: main
+  name: nginx
+

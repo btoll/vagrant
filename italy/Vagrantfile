@@ -7,6 +7,7 @@ Vagrant.configure("2") do |config|
     config.vm.network "public_network", ip: "192.168.1.100", bridge: "wlp3s0"
 
     config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder "/home/btoll/dotfiles", "/vagrant/dotfiles"
 
     config.ssh.forward_agent = true
 

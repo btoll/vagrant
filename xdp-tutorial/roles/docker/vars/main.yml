@@ -1,0 +1,13 @@
+---
+packages:
+  prereq:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+  engine:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+

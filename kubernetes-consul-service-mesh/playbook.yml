@@ -1,0 +1,10 @@
+---
+- name: kilgoretrout
+  hosts: servers
+  become: true
+  gather_facts: no
+
+  roles:
+    - common
+    - docker
+

@@ -2,24 +2,61 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-    config.vm.box = "ubuntu/focal64"
+    config.vm.box = "debian/bullseye64"
+    config.vm.hostname = "vagrant-nodejs"
 
+    config.vm.network "forwarded_port", guest: 3000, host: 3000
+#    config.vm.network "private_network", ip: "192.168.33.10"
+#    config.vm.network "public_network", ip: "192.168.1.53", bridge: "wlp3s0"
+
+    config.vm.synced_folder ".", "/vagrant"
     config.ssh.forward_agent = true
 
     config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 4
+        vb.gui = false
         vb.memory = 8192
-        vb.name = "node"
+        vb.name = "nodejs"
     end
 
     config.vm.provision "shell", inline: <<-SHELL
-        apt-get update
+        apt-get update && \
         apt-get install -y \
+            build-essential \
             curl \
-            git
+            git \
+            gnupg2 \
+            unzip \
+            wget
 
-        # https://github.com/nodesource/distributions/blob/master/README.md#debinstall
-        curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-        apt-get install -y nodejs
+#        wget -O - https://nodejs.org/dist/v18.18.0/node-v18.18.0-linux-x64.tar.xz \
+#            | tar -xJf -
+#        install -m 0755 node-v18.18.0-linux-x64/bin/* /usr/local/bin
+#
+        curl https://nodejs.org/download/release/v18.18.0/node-v18.18.0-linux-x64.tar.xz \
+            | tar -xJf - -C /usr/local
+
+        su -c "echo 'PATH=\"/usr/local/node-v18.18.0-linux-x64/bin:$PATH\"' >> /home/vagrant/.bashrc; \
+            unzip /vagrant/rbay.zip -d /home/vagrant; \
+            rm -rf /home/vagrant/__MACOSX; \
+            cp /vagrant/env /home/vagrant/rbay/.env
+            " vagrant
+
+        curl -fsSL https://packages.redis.io/gpg \
+            | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+        chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+        echo "deb \
+            [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] \
+            https://packages.redis.io/deb $(lsb_release -cs) main" \
+            | tee /etc/apt/sources.list.d/redis.list
+        apt-get update
+        apt-get install -y redis-stack-server
+
+        # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+        # Also, fixes the same warnings for Perl.
+        localedef -i en_US -f UTF-8 en_US.UTF-8
     SHELL
+
+    config.vm.post_up_message = "npm run dev -- --host"
 end
 

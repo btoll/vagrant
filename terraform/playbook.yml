@@ -1,0 +1,8 @@
+---
+- name: kilgoretrout
+  hosts: servers
+  become: true
+
+  roles:
+    - common
+

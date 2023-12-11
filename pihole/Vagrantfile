@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://docs.pi-hole.net/
+#
+# To update pihole:
+#     pihole -up
+#
+# nmcli device modify wlp3s0 ipv4.ignore-auto-dns yes
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bullseye64"
+    config.vm.hostname = "vagrant-pihole"
+
+    config.vm.network "public_network", ip: "192.168.1.53", bridge: "wlp3s0"
+
+    config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder "/home/btoll/dotfiles", "/vagrant/dotfiles"
+
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 2
+        vb.gui = false
+        vb.memory = 1024
+        vb.name = "pihole"
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update && \
+        apt-get install -y \
+            curl
+
+#        curl -sSL https://install.pi-hole.net | bash
+    SHELL
+end
+
+

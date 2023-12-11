@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "centos/7"
+    config.vm.hostname = "vagrant-podman"
+
+#    config.vm.network "forwarded_port", guest: 80, host: 8080
+#    config.vm.network "private_network", ip: "192.168.33.10"
+#    config.vm.network "public_network", ip: "192.168.1.53", bridge: "wlp3s0"
+
+    config.vm.synced_folder ".", "/vagrant"
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 4
+        vb.gui = false
+        vb.memory = 8192
+        vb.name = "podman"
+    end
+
+#    config.vm.provision :shell do |s|
+#        s.path = "scripts/root.sh"
+#        s.env = {
+#            USER:ENV["USER"],
+#        }
+#    end
+
+end
+

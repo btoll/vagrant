@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# curl localhost:8500/v1/catalog/nodes
+#
+# consul agent -dev
+# consul members
+# consul leave
+# mkdir consul.d
+# cp /vagrant/web.json consul.d
+# consul agent -dev -enable-script-checks -config-dir=./consul.d
+# dig @127.0.0.1 -p 8600 web.service.consul A
+# dig @127.0.0.1 -p 8600 web.service.consul SRV
+# dig @127.0.0.1 -p 8600 rails.web.service.consul SRV
+# curl http://127.0.0.1:8500/v1/catalog/service/web
+
+NODES = 1
+
+Vagrant.configure("2") do |config|
+    (0..NODES-1).each do |i|
+        config.vm.define "node#{i}" do |node|
+            node.vm.box =  "debian/bookworm64"
+            node.vm.hostname = "node#{i}"
+
+            node.vm.network "private_network", ip: "10.0.10" + ".#{100 + i}"
+
+            node.vm.synced_folder ".", "/vagrant"
+            node.ssh.forward_agent = true
+
+            node.vm.provider :virtualbox do |vb|
+                vb.cpus = 4
+                vb.gui = false
+                vb.memory = 8192
+                vb.name = "consul#{i}"
+            end
+
+            node.vm.provision "shell", inline: <<-SHELL
+                apt-get update && \
+                apt-get install -y \
+                    build-essential \
+                    curl \
+                    git \
+                    gnupg2 \
+                    wget
+
+                curl --fail --silent --show-error --location https://apt.releases.hashicorp.com/gpg | \
+                    gpg --dearmor | \
+                    dd of=/usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+                   tee -a /etc/apt/sources.list.d/hashicorp.list
+
+                apt-get update && \
+                    apt-get install consul
+
+                # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+                # Also, fixes the same warnings for Perl.
+                localedef -i en_US -f UTF-8 en_US.UTF-8
+            SHELL
+        end
+    end
+end
+

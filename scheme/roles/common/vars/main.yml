@@ -1,0 +1,19 @@
+---
+packages:
+  - ansible
+  - build-essential
+  - curl
+  - git
+  - gnupg2
+  - haveged
+  - libreoffice
+  - python3-pip
+  - python3.9
+  - shellcheck
+  - tree
+  - vagrant
+  - vim
+  - virtualenvwrapper
+  - wget
+go_version: 1.21.3
+

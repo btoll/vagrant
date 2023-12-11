@@ -1,0 +1,23 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    update_cache: yes
+    cache_valid_time: 36000
+    state: present
+
+- name: Configure nginx
+  template:
+    src: nginx.default.j2
+    dest: /etc/nginx/sites-available/default
+
+#- name: Install simpleserver service
+#  template:
+#    src: simpleserver.service
+#    dest: /etc/systemd/system
+
+- name: Start nginx
+  service:
+    name: nginx
+    state: started
+

@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-NODES = 3
+NODES = 2
 
 Vagrant.configure("2") do |config|
     (0..NODES-1).each do |i|
@@ -44,6 +44,23 @@ Vagrant.configure("2") do |config|
                     git \
                     gnupg2 \
                     wget
+
+                # Install Helm.
+                curl https://baltocdn.com/helm/signing.asc \
+                    | gpg --dearmor  \
+                    > /usr/share/keyrings/helm.gpg
+
+                echo "deb \
+                    [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] \
+                    https://baltocdn.com/helm/stable/debian/ all main" \
+                    | tee /etc/apt/sources.list.d/helm-stable-debian.list
+
+                apt-get update
+                apt-get install -y helm
+
+                helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                helm repo update
+                helm install prometheus prometheus-community/kube-prometheus-stack
 
                 # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
                 # Also, fixes the same warnings for Perl.

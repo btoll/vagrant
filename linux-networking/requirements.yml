@@ -1,0 +1,5 @@
+---
+- src: https://github.com/btoll/ansible-role-common
+  version: main
+  name: common
+
