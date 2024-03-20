@@ -1,0 +1,92 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# kubectl -n kube-system exec etcd-beta-control-plane -it -- etcdctl --cacert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/server.key --cert /etc/kubernetes/pki/etcd/server.crt get / --prefix --keys-only
+
+unless Vagrant.has_plugin?("vagrant-disksize")
+    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bookworm64"
+    config.vm.hostname = "vagrant-kind-nerdctl"
+
+    config.vm.network "forwarded_port", guest: 9000, host: 9000
+    config.vm.network "public_network", ip: "192.168.1.53", bridge: "wlp3s0"
+
+    config.vm.synced_folder ".", "/vagrant"
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 4
+        vb.gui = false
+        vb.memory = 8192
+        vb.name = "kind-nerdctl"
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update && \
+        apt-get install -y \
+            apt-transport-https \
+            build-essential \
+            ca-certificates \
+            curl \
+            git \
+            gnupg2 \
+            jq \
+            wget
+
+        # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+        # Also, fixes the same warnings for Perl.
+        localedef -i en_US -f UTF-8 en_US.UTF-8
+
+        # Install Kind.
+        [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64
+        chmod +x ./kind
+        mv ./kind /usr/local/bin/kind
+
+        # Install kubectl.
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key \
+            | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" \
+            | tee /etc/apt/sources.list.d/kubernetes.list
+        apt-get update
+        apt-get install -y kubectl
+
+        # Install Flux.
+        curl -o /tmp/flux.tar.gz -sLO https://github.com/fluxcd/flux2/releases/download/v2.2.3/flux_2.2.3_linux_amd64.tar.gz
+        tar -C /tmp/ -zxvf /tmp/flux.tar.gz
+        mv /tmp/flux /usr/local/bin
+
+
+        # Install the full nerdctl install, which includes `containerd` and its plugins, another cli for working with contaiNERD.
+        curl -LO https://github.com/containerd/nerdctl/releases/download/v1.7.5/nerdctl-full-1.7.5-linux-amd64.tar.gz
+        tar -xzf nerdctl-full-1.7.5-linux-amd64.tar.gz
+        mv nerdctl /usr/local/
+        rm nerdctl-full-1.7.5-linux-amd64.tar.gz
+
+#        # nerdctl plugins
+#        curl -OL https://github.com/containernetworking/plugins/releases/download/v1.4.1/cni-plugins-linux-amd64-v1.4.1.tgz
+#        mkdir -p /opt/cni/bin
+#        tar -xzf cni-plugins-linux-amd64-v1.4.1.tgz -C /opt/cni/bin
+#        rm cni-plugins-linux-amd64-v1.4.1.tgz
+    SHELL
+
+    config.vm.provision :ansible_local do |ansible|
+        ansible.become = true
+        ansible.groups = {
+            "servers" => ["default"]
+        }
+
+        ansible.compatibility_mode = "2.0"
+        ansible.playbook = "playbook.yml"
+        ansible.version = "latest"
+        ansible.extra_vars = {
+            ansible_python_interpreter: "/usr/bin/python3"
+        }
+        ansible.galaxy_roles_path = nil
+        ansible.galaxy_role_file = "requirements.yml"
+        ansible.galaxy_command = "ansible-galaxy install --role-file=%{role_file} --roles-path=%{roles_path}"
+    end
+end
+

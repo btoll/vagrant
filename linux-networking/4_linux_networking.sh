@@ -27,7 +27,7 @@ then
 elif [ "$1" = "add" ]
 then
     sudo ip link add name "$BRIDGE" type bridge
-    sudo ip address add 172.16.0.1/12 dev "$BRIDGE"
+    sudo ip address add 172.18.0.1/12 dev "$BRIDGE"
     sudo ip link set "$BRIDGE" up
 
     for i in {0..1}
@@ -41,9 +41,16 @@ then
         sudo ip link set "ceth$i" netns "net$i"
 
         INCREMENT=$((10 + 10 * "$i"))
-        sudo ip netns exec "net$i" ip address add "172.16.0.$INCREMENT/12" dev "ceth$i"
+        sudo ip netns exec "net$i" ip address add "172.18.0.$INCREMENT/12" dev "ceth$i"
         sudo ip netns exec "net$i" ip link set "ceth$i" up
+
+        # Add the route to the bridge interface so the new namespaces can reach the root namespace.
+        sudo ip netns exec "net$i" ip route add default via 172.18.0.1
     done
+
+    # Enabling packet forwarding turns the machine into a router, with the
+    # bridge interface acting as the default gateway for the containers.
+    echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 else
     printf "Unrecognized parameter \`%s\`.\n" "$1"
     exit 1

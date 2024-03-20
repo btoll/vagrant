@@ -1,0 +1,53 @@
+# in order to expose as a service, the pod must have a label
+# k expose pod debug --port 3333
+#
+# without hostname and subdomain:
+# 10-244-1-2.default.pod.cluster.local
+#
+# note that A/AAAA records are not created for pod names, so
+# hostname is required for them to be created.
+#
+# with hostname **and** subdomain **and** service:
+# debug-1.debug-subdomain.default.svc.cluster.local
+
+# https://github.com/kubernetes/dns/blob/master/docs/specification.md
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug
+  labels:
+    name: debug
+spec:
+  hostname: debug
+  subdomain: devops
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: debug
+    image: btoll/debug:latest
+    tty: true
+    stdin: true
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      runAsUser: 1001
+#      capabilities:
+#        drop: ["KILL", "NET_ADMIN"]
+  restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devops
+  labels:
+    name: devops
+spec:
+  selector:
+    name: debug
+  clusterIP: None
+  ports:
+  - name: foo # name is not required for single-port Services
+    port: 1234
+

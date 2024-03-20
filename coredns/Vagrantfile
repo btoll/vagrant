@@ -1,0 +1,56 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+unless Vagrant.has_plugin?("vagrant-disksize")
+    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "debian/bookworm64"
+    config.vm.hostname = "vagrant-coredns"
+#    config.disksize.size = "50GB"
+
+#    config.vm.network "forwarded_port", guest: 80, host: 8080
+#    config.vm.network "private_network", ip: "192.168.33.10"
+#    config.vm.network "public_network", ip: "192.168.1.53", bridge: "wlp3s0"
+
+    config.vm.synced_folder ".", "/vagrant"
+    config.ssh.forward_agent = true
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus = 4
+        vb.gui = false
+        vb.memory = 8192
+        vb.name = "coredns"
+    end
+
+#    config.vm.provision :shell do |s|
+#        s.path = "scripts/root.sh"
+#        s.env = {
+#            USER:ENV["USER"],
+#        }
+#    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+        apt-get update && \
+        apt-get install -y \
+            build-essential \
+            curl \
+            git \
+            gnupg2 \
+            wget
+
+        # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+        # Also, fixes the same warnings for Perl.
+        localedef -i en_US -f UTF-8 en_US.UTF-8
+
+        curl -sLO https://github.com/coredns/coredns/releases/download/v1.11.1/coredns_1.11.1_linux_amd64.tgz
+        curl -sLO https://github.com/coredns/coredns/releases/download/v1.11.1/coredns_1.11.1_linux_amd64.tgz.sha256
+        if ! sha256sum --check coredns_1.11.1_linux_amd64.tgz.sha256
+        then
+            echo "[ERROR] Download doesn't match SHA, aborting..."
+            exit 1
+        fi
+    SHELL
+end
+

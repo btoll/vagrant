@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+unless Vagrant.has_plugin?("vagrant-disksize")
+    raise  Vagrant::Errors::VagrantError.new, "vagrant-disksize plugin is missing. Please install it using 'vagrant plugin install vagrant-disksize' and rerun 'vagrant up'"
+end
+
+NODES = 2
+
+Vagrant.configure("2") do |config|
+    (0..NODES-1).each do |i|
+        config.vm.define "node#{i}" do |node|
+            node.vm.box =  "debian/bullseye64"
+            node.vm.hostname = "node#{i}"
+#            node.disksize.size = "50GB"
+
+            node.vm.network "public_network", ip: "192.168.1" + ".#{100 + i}", bridge: "wlp3s0"
+            node.vm.network "private_network", ip: "10.0.10" + ".#{100 + i}"
+
+            node.vm.synced_folder ".", "/vagrant"
+            node.ssh.forward_agent = true
+
+            node.vm.provider :virtualbox do |vb|
+                vb.cpus = 4
+                vb.gui = false
+                vb.memory = 8192
+                vb.name = "coredns"
+            end
+
+            node.vm.provision "shell", inline: <<-SHELL
+                apt-get update && \
+                apt-get install -y \
+                    build-essential \
+                    curl \
+                    git \
+                    gnupg2 \
+                    wget
+
+                # Fixes the "-bash: warning: setlocale: LC_ALL: cannot change locale (en_IN.UTF-8)" warning.
+                # Also, fixes the same warnings for Perl.
+                localedef -i en_US -f UTF-8 en_US.UTF-8
+            SHELL
+        end
+    end
+end
+

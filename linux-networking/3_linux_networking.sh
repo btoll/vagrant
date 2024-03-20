@@ -26,12 +26,12 @@ then
     do
         sudo ip netns add "net$i"
         sudo ip link add "veth$i" type veth peer name "ceth$i"
-        sudo ip address add 172.16.0."$((100 + "$i"))"/12 dev "veth$i"
+        sudo ip address add 172.18.0."$((100 + "$i"))"/12 dev "veth$i"
         sudo ip link set "veth$i" up
         sudo ip link set "ceth$i" netns "net$i"
 
         INCREMENT=$((10 + 10 * "$i"))
-        sudo ip netns exec "net$i" ip address add "172.16.0.$INCREMENT/12" dev "ceth$i"
+        sudo ip netns exec "net$i" ip address add "172.18.0.$INCREMENT/12" dev "ceth$i"
         sudo ip netns exec "net$i" ip link set "ceth$i" up
     done
 else

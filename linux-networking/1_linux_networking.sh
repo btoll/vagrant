@@ -22,11 +22,11 @@ then
     sudo ip link set veth0 up
     sudo ip link set ceth0 up
 
-    sudo ip addr add 172.16.0.10/12 dev veth0
-    sudo ip addr add 172.16.0.20/12 dev ceth0
+    sudo ip addr add 172.18.0.10/12 dev veth0
+    sudo ip addr add 172.18.0.20/12 dev ceth0
 
-    printf "ping %s\n" 172.16.0.10
-    printf "ping %s\n" 172.16.0.20
+    printf "ping %s\n" 172.18.0.10
+    printf "ping %s\n" 172.18.0.20
 else
     printf "Unrecognized parameter \`%s\`.\n" "$1"
     exit 1
